@@ -116,6 +116,7 @@ document.getElementById('legend').innerHTML='<div class="legend-title">Chú thí
 async function loadAll(){
  if(!configured){setStatus('Chưa cấu hình Supabase','offline');openAuth();document.getElementById('loginError').textContent='Bạn cần điền SUPABASE_URL và SUPABASE_KEY trong code trước.';return}
  const {data:{session}}=await sb.auth.getSession(); currentUser=session?.user||null;
+ console.log('SESSION:', session);
  await loadProfile(); await Promise.all([loadStatuses(),loadMachines(),loadHistory()]);
  updateAuthUI();render();subscribeRealtime();
  setStatus(currentUser?(canEdit()?'Admin — realtime':'Chỉ xem — realtime'):'Chỉ xem — realtime','online');
