@@ -164,7 +164,9 @@ function updateAuthUI(){
 
  ['addBtn','exportBtn','historyBtn','colorBtn'].forEach(id=>{
    const e=document.getElementById(id);
-   if(e) e.style.display=isAdmin?'inline-flex':'none';
+   if(!e) return;
+   e.classList.toggle('admin-only', !isAdmin);
+   e.style.display=isAdmin ? 'inline-flex' : '';
  });
 
  const hint=document.getElementById('hint');
@@ -197,10 +199,26 @@ async function login(){
  const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value;
  const e=document.getElementById('loginError');e.textContent='';
  if(!email||!password){e.textContent='Nhập email và mật khẩu.';return}
- const {error}=await sb.auth.signInWithPassword({email,password});if(error){e.textContent=error.message;return}
- closeAuth();await loadAll();
+ const {data,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){e.textContent=error.message;return}
+ currentUser=data?.user || null;
+ await loadProfile();
+ updateAuthUI();
+ if(currentRole!=='admin'){
+   e.textContent='Tài khoản này chưa được cấp quyền admin trong bảng profiles.';
+   return;
+ }
+ closeAuth();
+ await Promise.all([loadStatuses(),loadMachines(),loadHistory()]);
+ render();
+ setStatus('Admin — realtime','online');
 }
 sb?.auth.onAuthStateChange(async(event,session)=>{
+  if(event==='SIGNED_IN' && session?.user){
+    currentUser=session.user;
+    await loadProfile();
+    updateAuthUI();
+  }
   if(event==='SIGNED_OUT'){
     currentUser=null;
     currentRole=null;
