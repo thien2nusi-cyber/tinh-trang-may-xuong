@@ -47,9 +47,7 @@ body{
   font-weight:600
 }
 
-.btn:hover{
-  filter:brightness(.94)
-}
+.btn:hover{filter:brightness(.94)}
 
 .btn.primary{
   background:#2563eb;
@@ -89,67 +87,59 @@ body{
   transform-origin:0 0
 }
 
-/* =========================
+/* ================================
    Ô MÁY
-   ========================= */
+   KÍCH THƯỚC GIỮ NGUYÊN
+   CHỈ TĂNG CỠ CHỮ
+   ================================ */
 
 .machine{
   position:absolute;
-  width:190px;
-  min-height:105px;
+  width:170px;
+  min-height:86px;
   border:2px solid currentColor;
   border-radius:9px;
   box-shadow:0 2px 7px #0003;
   cursor:grab;
   user-select:none;
-  padding:10px 8px;
+  padding:9px;
   text-align:center;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
 }
 
 .machine:active{
   cursor:grabbing
 }
 
-/* TÊN MÁY - TO */
+/* Tên máy - TO HƠN */
 .machine .name{
-  width:100%;
-  font-weight:900;
+  font-weight:800;
   font-size:24px !important;
-  line-height:28px;
+  line-height:26px !important;
   text-align:center;
-  margin:0;
 }
 
-/* MÃ ĐƠN HÀNG - TO */
+/* Mã hàng - TO HƠN */
 .machine .code{
-  width:100%;
-  font-size:17px !important;
-  line-height:21px;
-  margin-top:8px;
-  font-weight:800;
+  font-size:16px !important;
+  line-height:19px !important;
+  margin-top:7px;
+  font-weight:700;
   text-align:center;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis
 }
 
-/* TRẠNG THÁI - TO */
+/* Trạng thái - TO HƠN */
 .machine .status{
-  width:100%;
   font-size:14px !important;
-  line-height:18px;
-  margin-top:8px;
-  font-weight:800;
-  text-align:center
+  line-height:17px !important;
+  margin-top:7px;
+  font-weight:700;
+  text-align:center;
 }
 
-/* =========================
-   CHÚ THÍCH
-   ========================= */
+/* ================================ */
 
 #legend{
   position:absolute;
@@ -165,8 +155,8 @@ body{
 }
 
 .legend-title{
-  font-size:18px;
-  font-weight:800;
+  font-size:16px;
+  font-weight:700;
   margin-bottom:12px
 }
 
@@ -180,18 +170,14 @@ body{
   border-radius:10px;
   padding:11px 8px;
   text-align:center;
-  font-weight:800;
-  font-size:14px;
-  min-height:68px;
+  font-weight:700;
+  font-size:12px;
+  min-height:58px;
   display:flex;
   align-items:center;
   justify-content:center;
   box-shadow:inset 0 0 0 1px #ffffff55
 }
-
-/* =========================
-   PANEL
-   ========================= */
 
 #panel,
 #historyPanel,
@@ -359,10 +345,6 @@ select{
   margin-top:10px
 }
 
-/* =========================
-   MÀU TRẠNG THÁI
-   ========================= */
-
 .color-grid{
   display:grid;
   grid-template-columns:1fr 80px 80px 1fr;
@@ -385,10 +367,6 @@ select{
   font-size:11px;
   font-weight:700
 }
-
-/* =========================
-   ZOOM
-   ========================= */
 
 #zoom{
   position:absolute;
@@ -521,22 +499,6 @@ select{
   .color-grid{
     grid-template-columns:1fr 70px 70px 1fr
   }
-
-  .machine{
-    width:190px
-  }
-
-  .machine .name{
-    font-size:23px !important
-  }
-
-  .machine .code{
-    font-size:16px !important
-  }
-
-  .machine .status{
-    font-size:14px !important
-  }
 }
 </style>
 </head>
@@ -584,7 +546,8 @@ select{
   <button class="zbtn" onclick="resetView()">⌂</button>
 </div>
 
-<!-- PANEL THÔNG TIN MÁY -->
+
+<!-- PANEL MÁY -->
 
 <div id="panel">
 
@@ -603,26 +566,12 @@ select{
   <select id="pstatus"></select>
 
   <div class="row">
-
-    <button class="btn primary" onclick="saveMachine()">
-      Lưu
-    </button>
-
-    <button
-      class="btn danger admin-only"
-      id="deleteMachineBtn"
-      onclick="deleteMachine()">
-      🗑 Xóa máy
-    </button>
-
-    <button class="btn" onclick="closePanel()">
-      Đóng
-    </button>
-
+    <button class="btn primary" onclick="saveMachine()">Lưu</button>
+    <button class="btn danger admin-only" id="deleteMachineBtn" onclick="deleteMachine()">🗑 Xóa máy</button>
+    <button class="btn" onclick="closePanel()">Đóng</button>
   </div>
 
 </div>
-
 
 <!-- HISTORY -->
 
@@ -636,7 +585,6 @@ select{
   <div id="historyList"></div>
 
 </div>
-
 
 <!-- COLORS -->
 
@@ -653,38 +601,21 @@ select{
     Tất cả máy đang dùng trạng thái đó sẽ đổi theo màu mới nhất.
   </div>
 
-  <div style="
-    display:grid;
-    grid-template-columns:1fr 80px 80px 1fr;
-    gap:8px;
-    align-items:center;
-    margin:12px 0 2px;
-    font-size:11px;
-    color:#666">
-
+  <div style="display:grid;grid-template-columns:1fr 80px 80px 1fr;gap:8px;align-items:center;margin:12px 0 2px;font-size:11px;color:#666">
     <b>Trạng thái</b>
     <b>Nền</b>
     <b>Chữ</b>
     <b>Xem trước</b>
-
   </div>
 
   <div id="colorSettings"></div>
 
   <div class="row">
-
-    <button class="btn primary" onclick="saveColors()">
-      Lưu màu
-    </button>
-
-    <button class="btn" onclick="resetColors()">
-      Mặc định
-    </button>
-
+    <button class="btn primary" onclick="saveColors()">Lưu màu</button>
+    <button class="btn" onclick="resetColors()">Mặc định</button>
   </div>
 
 </div>
-
 
 <!-- EXPORT -->
 
@@ -710,19 +641,11 @@ select{
   </div>
 
   <div class="row">
-
-    <button class="btn primary" onclick="doExport()">
-      Xuất Excel
-    </button>
-
-    <button class="btn" onclick="closeExport()">
-      Đóng
-    </button>
-
+    <button class="btn primary" onclick="doExport()">Xuất Excel</button>
+    <button class="btn" onclick="closeExport()">Đóng</button>
   </div>
 
 </div>
-
 
 <!-- USERS -->
 
@@ -735,40 +658,26 @@ select{
 
   <div class="small">
     Tạo tài khoản Viewer/Admin trực tiếp từ đây.
-    Mật khẩu được Supabase Auth quản lý;
-    không lưu mật khẩu trong database ứng dụng.
+    Mật khẩu được Supabase Auth quản lý.
   </div>
 
   <label>Email</label>
-  <input
-    id="newEmail"
-    type="email"
-    placeholder="viewer@congty.com">
+  <input id="newEmail" type="email" placeholder="viewer@congty.com">
 
   <label>Mật khẩu tạm</label>
-  <input
-    id="newPassword"
-    type="password"
-    placeholder="Tối thiểu 6 ký tự">
+  <input id="newPassword" type="password" placeholder="Tối thiểu 6 ký tự">
 
   <label>Quyền</label>
 
   <select id="newRole">
-    <option value="viewer">
-      Viewer — chỉ xem
-    </option>
-
-    <option value="admin">
-      Admin — được sửa
-    </option>
+    <option value="viewer">Viewer — chỉ xem</option>
+    <option value="admin">Admin — được sửa</option>
   </select>
 
   <div class="row">
-
     <button class="btn primary" onclick="createUser()">
       Tạo người dùng
     </button>
-
   </div>
 
   <div id="userError" class="error"></div>
@@ -779,129 +688,73 @@ select{
 
 </div>
 
+<!-- VIEWER -->
 
-<!-- VIEWER GATE -->
+<div id="viewerGate" style="display:none;position:fixed;inset:0;background:#0008;z-index:40;align-items:center;justify-content:center">
 
-<div
-  id="viewerGate"
-  style="
-    display:none;
-    position:fixed;
-    inset:0;
-    background:#0008;
-    z-index:40;
-    align-items:center;
-    justify-content:center">
-
-  <div style="
-    width:360px;
-    background:#fff;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 10px 40px #0005">
+  <div style="width:360px;background:#fff;border-radius:12px;padding:20px;box-shadow:0 10px 40px #0005">
 
     <h2 style="margin:0 0 8px;font-size:18px">
       👁 Chế độ xem
     </h2>
 
-    <div style="
-      font-size:13px;
-      color:#666;
-      margin-bottom:12px">
-
+    <div style="font-size:13px;color:#666;margin-bottom:12px">
       Nhập mã xem chung để xem sơ đồ.
       Không cần tài khoản; chế độ này chỉ được xem.
-
     </div>
 
-    <input
-      id="viewerCode"
-      type="password"
-      placeholder="Mã xem">
+    <input id="viewerCode" type="password" placeholder="Mã xem">
 
-    <div
-      id="viewerError"
-      style="
-        color:#e5484d;
-        font-size:12px;
-        min-height:18px;
-        margin-top:7px">
-    </div>
+    <div id="viewerError" style="color:#e5484d;font-size:12px;min-height:18px;margin-top:7px"></div>
 
     <div class="row">
-
       <button class="btn primary" onclick="unlockViewer()">
         Xem sơ đồ
       </button>
-
     </div>
 
   </div>
 
 </div>
 
-
 <div id="loginOverlay"></div>
-
 
 <!-- LOGIN -->
 
 <div id="loginPanel">
 
   <div class="panel-head">
-
     <h2>🔐 Đăng nhập</h2>
-
-    <button class="closex" onclick="closeAuth()">
-      ×
-    </button>
-
+    <button class="closex" onclick="closeAuth()">×</button>
   </div>
 
   <label>Email</label>
-
-  <input
-    id="loginEmail"
-    type="email"
-    autocomplete="username">
+  <input id="loginEmail" type="email" autocomplete="username">
 
   <label>Mật khẩu</label>
-
-  <input
-    id="loginPassword"
-    type="password"
-    autocomplete="current-password">
+  <input id="loginPassword" type="password" autocomplete="current-password">
 
   <div id="loginError" class="error"></div>
 
   <div class="row">
-
-    <button class="btn primary" onclick="login()">
-      Đăng nhập
-    </button>
-
-    <button class="btn" onclick="closeAuth()">
-      Hủy
-    </button>
-
+    <button class="btn primary" onclick="login()">Đăng nhập</button>
+    <button class="btn" onclick="closeAuth()">Hủy</button>
   </div>
 
   <div class="note">
     Tài khoản được quản lý bởi Supabase Auth.
-    Admin/Viewer được phân quyền bằng database RLS,
-    không chỉ bằng giao diện.
+    Admin/Viewer được phân quyền bằng database RLS.
   </div>
 
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-/* =========================================================
+/* ============================================================
    SUPABASE
-   ========================================================= */
+   ============================================================ */
 
 const SUPABASE_URL =
 'https://maemqzfpsxczklixxaic.supabase.co';
@@ -930,20 +783,19 @@ configured
 : null;
 
 
-/* =========================================================
-   BIẾN
-   ========================================================= */
+/* ============================================================
+   DATA
+   ============================================================ */
 
 let machines=[];
 let statuses=[];
 let history=[];
 let profiles=[];
-let selected=null;
 
+let selected=null;
 let scale=1;
 let panX=0;
 let panY=0;
-
 let drag=null;
 let pan=null;
 
@@ -954,12 +806,11 @@ const world=document.getElementById('world');
 const canvas=document.getElementById('canvas');
 
 
-/* =========================================================
-   HÀM CHUNG
-   ========================================================= */
+/* ============================================================
+   HELPERS
+   ============================================================ */
 
 function esc(x){
-
   return String(x??'').replace(
     /[&<>"']/g,
     a=>({
@@ -969,29 +820,23 @@ function esc(x){
       '"':'&quot;',
       "'":'&#39;'
     }[a])
-  );
-
+  )
 }
 
 function canEdit(){
-
-  return currentRole==='admin';
-
+  return currentRole==='admin'
 }
 
 function setStatus(text,kind='online'){
-
   const e=document.getElementById('statusbar');
 
   e.innerHTML=
   `<span class="badge ${kind}">
     ${esc(text)}
-  </span>`;
-
+  </span>`
 }
 
 function closeAll(){
-
   [
     'panel',
     'historyPanel',
@@ -1000,27 +845,19 @@ function closeAll(){
     'usersPanel'
   ].forEach(
     id=>document.getElementById(id).style.display='none'
-  );
-
+  )
 }
-
-
-/* =========================================================
-   TÊN HIỂN THỊ TRẠNG THÁI
-   ========================================================= */
 
 function statusDisplayName(name){
-
   return String(name??'').trim()==='Thiếu thiết bị'
     ? 'Thiếu TB & NL'
-    : name;
-
+    : name
 }
 
 
-/* =========================================================
-   RENDER MÁY
-   ========================================================= */
+/* ============================================================
+   RENDER
+   ============================================================ */
 
 function render(){
 
@@ -1028,7 +865,7 @@ function render(){
 
   machines.forEach(m=>{
 
-    const st =
+    const st=
       statuses.find(s=>s.id===m.status_id) ||
       statuses[0];
 
@@ -1037,7 +874,6 @@ function render(){
     const d=document.createElement('div');
 
     d.className='machine';
-
     d.dataset.id=m.id;
 
     d.style.left=m.x+'px';
@@ -1047,7 +883,6 @@ function render(){
     d.style.color=st.text_color;
 
     d.innerHTML=`
-
       <div class="name">
         ${esc(m.name)}
       </div>
@@ -1059,25 +894,19 @@ function render(){
       <div class="status">
         ${esc(statusDisplayName(st.name))}
       </div>
-
     `;
 
     d.onmousedown=e=>{
-
       if(!canEdit())return;
-
-      startDrag(e,m);
-
+      startDrag(e,m)
     };
 
     d.ondblclick=e=>{
-
       e.stopPropagation();
 
       if(!canEdit())return;
 
-      openPanel(m.id);
-
+      openPanel(m.id)
     };
 
     world.appendChild(d);
@@ -1085,44 +914,30 @@ function render(){
   });
 
 
-  /* ===============================
-     CHÚ THÍCH TỰ ĐỘNG
-     =============================== */
-
   document.getElementById('legend').innerHTML=
 
-  `
-    <div class="legend-title">
-      Chú thích trạng thái máy
+  '<div class="legend-title">Chú thích trạng thái máy</div>' +
+
+  '<div class="legend-items">' +
+
+  statuses.map(s=>`
+
+    <div
+      class="legend-item"
+      style="background:${s.bg_color};color:${s.text_color}"
+    >
+      ${esc(statusDisplayName(s.name))}
     </div>
 
-    <div class="legend-items">
+  `).join('') +
 
-      ${
-        statuses.map(s=>`
-
-          <div
-            class="legend-item"
-            style="
-              background:${s.bg_color};
-              color:${s.text_color}">
-
-            ${esc(statusDisplayName(s.name))}
-
-          </div>
-
-        `).join('')
-      }
-
-    </div>
-  `;
-
+  '</div>';
 }
 
 
-/* =========================================================
+/* ============================================================
    LOAD DATA
-   ========================================================= */
+   ============================================================ */
 
 async function loadAll(){
 
@@ -1135,9 +950,7 @@ async function loadAll(){
 
     openAuth();
 
-    document.getElementById(
-      'loginError'
-    ).textContent=
+    document.getElementById('loginError').textContent=
       'Bạn cần điền SUPABASE_URL và SUPABASE_KEY trong code trước.';
 
     return;
@@ -1173,7 +986,6 @@ async function loadAll(){
       : 'Chỉ xem — realtime',
     'online'
   );
-
 }
 
 
@@ -1188,21 +1000,17 @@ async function loadProfile(){
     error
   }=
   await sb
-    .from('profiles')
-    .select('role')
-    .eq('id',currentUser.id)
-    .maybeSingle();
+  .from('profiles')
+  .select('role')
+  .eq('id',currentUser.id)
+  .maybeSingle();
 
   if(error){
-
     console.error(error);
-
     return;
-
   }
 
   currentRole=data?.role||'viewer';
-
 }
 
 
@@ -1213,20 +1021,16 @@ async function loadStatuses(){
     error
   }=
   await sb
-    .from('statuses')
-    .select('*')
-    .order('sort_order');
+  .from('statuses')
+  .select('*')
+  .order('id');
 
   if(error){
-
     alert(error.message);
-
     return;
-
   }
 
   statuses=data||[];
-
 }
 
 
@@ -1237,20 +1041,16 @@ async function loadMachines(){
     error
   }=
   await sb
-    .from('machines')
-    .select('*')
-    .order('id');
+  .from('machines')
+  .select('*')
+  .order('id');
 
   if(error){
-
     alert(error.message);
-
     return;
-
   }
 
   machines=data||[];
-
 }
 
 
@@ -1261,30 +1061,26 @@ async function loadHistory(){
     error
   }=
   await sb
-    .from('change_history')
-    .select('*')
-    .order(
-      'created_at',
-      {ascending:false}
-    )
-    .limit(1000);
+  .from('change_history')
+  .select('*')
+  .order(
+    'created_at',
+    {ascending:false}
+  )
+  .limit(1000);
 
   if(error){
-
     console.error(error);
-
     return;
-
   }
 
   history=data||[];
-
 }
 
 
-/* =========================================================
+/* ============================================================
    REALTIME
-   ========================================================= */
+   ============================================================ */
 
 let realtimeChannel=null;
 
@@ -1294,84 +1090,67 @@ function subscribeRealtime(){
 
   realtimeChannel=
 
-    sb.channel('machine-board')
+  sb
+  .channel('machine-board')
 
-    .on(
-      'postgres_changes',
-      {
-        event:'*',
-        schema:'public',
-        table:'machines'
-      },
-      async()=>{
+  .on(
+    'postgres_changes',
+    {
+      event:'*',
+      schema:'public',
+      table:'machines'
+    },
+    async()=>{
+      await loadMachines();
+      render();
+    }
+  )
 
-        await loadMachines();
+  .on(
+    'postgres_changes',
+    {
+      event:'*',
+      schema:'public',
+      table:'statuses'
+    },
+    async()=>{
+      await loadStatuses();
+      render();
+    }
+  )
 
-        render();
+  .on(
+    'postgres_changes',
+    {
+      event:'*',
+      schema:'public',
+      table:'change_history'
+    },
+    async()=>{
+      await loadHistory();
 
+      if(
+        document.getElementById('historyPanel')
+        .style.display==='block'
+      ){
+        renderHistory();
       }
-    )
+    }
+  )
 
-    .on(
-      'postgres_changes',
-      {
-        event:'*',
-        schema:'public',
-        table:'statuses'
-      },
-      async()=>{
-
-        await loadStatuses();
-
-        render();
-
-      }
-    )
-
-    .on(
-      'postgres_changes',
-      {
-        event:'*',
-        schema:'public',
-        table:'change_history'
-      },
-      async()=>{
-
-        await loadHistory();
-
-        if(
-          document.getElementById(
-            'historyPanel'
-          ).style.display==='block'
-        ){
-
-          renderHistory();
-
-        }
-
-      }
-    )
-
-    .subscribe(status=>{
-
-      console.log(
-        'Realtime:',
-        status
-      );
-
-    });
-
+  .subscribe(status=>{
+    console.log('Realtime:',status);
+  });
 }
 
 
-/* =========================================================
+/* ============================================================
    AUTH UI
-   ========================================================= */
+   ============================================================ */
 
 function updateAuthUI(){
 
-  const auth=
-    document.getElementById('authBtn');
+  const auth=document.getElementById('authBtn');
 
   const isAdmin=
     !!currentUser &&
@@ -1391,8 +1170,7 @@ function updateAuthUI(){
     'deleteMachineBtn'
   ].forEach(id=>{
 
-    const e=
-      document.getElementById(id);
+    const e=document.getElementById(id);
 
     if(!e)return;
 
@@ -1422,20 +1200,22 @@ function updateAuthUI(){
   });
 
 
-  const hint=
-    document.getElementById('hint');
+  const hint=document.getElementById('hint');
 
   if(hint){
 
     hint.textContent=
       isAdmin
-        ? 'Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa'
-        : 'Kéo nền • Cuộn để zoom';
+      ? 'Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa'
+      : 'Kéo nền • Cuộn để zoom';
 
   }
-
 }
 
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
 
 function openAuth(){
 
@@ -1447,7 +1227,6 @@ function openAuth(){
     sb.auth.signOut();
 
     return;
-
   }
 
   if(!configured){
@@ -1457,40 +1236,32 @@ function openAuth(){
     );
 
     return;
-
   }
 
-  document.getElementById(
-    'loginPanel'
-  ).style.display='block';
+  document.getElementById('loginPanel')
+    .style.display='block';
 
-  document.getElementById(
-    'loginOverlay'
-  ).style.display='block';
+  document.getElementById('loginOverlay')
+    .style.display='block';
 
-  document.getElementById(
-    'loginEmail'
-  ).focus();
-
+  document.getElementById('loginEmail')
+    .focus();
 }
 
 
 function closeAuth(){
 
-  document.getElementById(
-    'loginPanel'
-  ).style.display='none';
+  document.getElementById('loginPanel')
+    .style.display='none';
 
-  document.getElementById(
-    'loginOverlay'
-  ).style.display='none';
-
+  document.getElementById('loginOverlay')
+    .style.display='none';
 }
 
 
-/* =========================================================
+/* ============================================================
    VIEWER
-   ========================================================= */
+   ============================================================ */
 
 const VIEWER_CODE='123456';
 
@@ -1505,9 +1276,7 @@ function showViewerGate(){
   if(viewerUnlocked)return;
 
   const g=
-    document.getElementById(
-      'viewerGate'
-    );
+    document.getElementById('viewerGate');
 
   if(g){
 
@@ -1518,7 +1287,6 @@ function showViewerGate(){
     ).focus();
 
   }
-
 }
 
 
@@ -1545,20 +1313,18 @@ function unlockViewer(){
     updateAuthUI();
 
     return;
-
   }
 
   document.getElementById(
     'viewerError'
   ).textContent=
     'Mã xem không đúng.';
-
 }
 
 
-/* =========================================================
+/* ============================================================
    LOGIN
-   ========================================================= */
+   ============================================================ */
 
 async function login(){
 
@@ -1585,8 +1351,8 @@ async function login(){
       'Nhập email và mật khẩu.';
 
     return;
-
   }
+
 
   const {
     data,
@@ -1597,21 +1363,23 @@ async function login(){
     password
   });
 
+
   if(error){
 
     e.textContent=
       error.message;
 
     return;
-
   }
 
+
   currentUser=
-    data?.user||null;
+    data?.user || null;
 
   await loadProfile();
 
   updateAuthUI();
+
 
   if(currentRole!=='admin'){
 
@@ -1619,8 +1387,8 @@ async function login(){
       'Tài khoản này chưa được cấp quyền admin trong bảng profiles.';
 
     return;
-
   }
+
 
   closeAuth();
 
@@ -1636,9 +1404,12 @@ async function login(){
     'Admin — realtime',
     'online'
   );
-
 }
 
+
+/* ============================================================
+   AUTH STATE
+   ============================================================ */
 
 sb?.auth.onAuthStateChange(
   async(event,session)=>{
@@ -1648,19 +1419,17 @@ sb?.auth.onAuthStateChange(
       session?.user
     ){
 
-      currentUser=
-        session.user;
+      currentUser=session.user;
 
       await loadProfile();
 
       updateAuthUI();
-
     }
+
 
     if(event==='SIGNED_OUT'){
 
       currentUser=null;
-
       currentRole=null;
 
       closeAll();
@@ -1671,20 +1440,15 @@ sb?.auth.onAuthStateChange(
         'Đã đăng xuất — chỉ xem',
         'viewer'
       );
-
     }
 
   }
 );
 
-</script>
 
-
-<script>
-
-/* =========================================================
-   KÉO MÁY
-   ========================================================= */
+/* ============================================================
+   MACHINE DRAG
+   ============================================================ */
 
 function startDrag(e,m){
 
@@ -1701,9 +1465,7 @@ function startDrag(e,m){
   };
 
   document.onmousemove=moveDrag;
-
   document.onmouseup=endDrag;
-
 }
 
 
@@ -1719,10 +1481,12 @@ function moveDrag(e){
     drag.oy+
     (e.clientY-drag.sy)/scale;
 
+
   const d=
     document.querySelector(
       `[data-id="${drag.m.id}"]`
     );
+
 
   if(d){
 
@@ -1731,9 +1495,7 @@ function moveDrag(e){
 
     d.style.top=
       drag.m.y+'px';
-
   }
-
 }
 
 
@@ -1748,16 +1510,18 @@ async function endDrag(){
   document.onmousemove=null;
   document.onmouseup=null;
 
+
   const {
     error
   }=
   await sb
-    .from('machines')
-    .update({
-      x:Math.round(m.x),
-      y:Math.round(m.y)
-    })
-    .eq('id',m.id);
+  .from('machines')
+  .update({
+    x:Math.round(m.x),
+    y:Math.round(m.y)
+  })
+  .eq('id',m.id);
+
 
   if(error){
 
@@ -1771,15 +1535,13 @@ async function endDrag(){
       'Vị trí',
       `(${Math.round(m.x)}, ${Math.round(m.y)})`
     );
-
   }
-
 }
 
 
-/* =========================================================
-   KÉO NỀN
-   ========================================================= */
+/* ============================================================
+   PAN / ZOOM
+   ============================================================ */
 
 canvas.onmousedown=e=>{
 
@@ -1788,12 +1550,14 @@ canvas.onmousedown=e=>{
     e.target!==world
   )return;
 
+
   pan={
     sx:e.clientX,
     sy:e.clientY,
     ox:panX,
     oy:panY
   };
+
 
   document.onmousemove=e=>{
 
@@ -1808,19 +1572,16 @@ canvas.onmousedown=e=>{
       pan.sy;
 
     applyView();
-
   };
+
 
   document.onmouseup=()=>{
 
     document.onmousemove=null;
-
     document.onmouseup=null;
-
     pan=null;
 
   };
-
 };
 
 
@@ -1829,13 +1590,10 @@ canvas.onwheel=e=>{
   e.preventDefault();
 
   zoomBy(
-    e.deltaY<0
-      ? 1.1
-      : .9,
+    e.deltaY<0?1.1:.9,
     e.clientX,
     e.clientY
   );
-
 };
 
 
@@ -1843,7 +1601,6 @@ function applyView(){
 
   world.style.transform=
     `translate(${panX}px,${panY}px) scale(${scale})`;
-
 }
 
 
@@ -1864,37 +1621,36 @@ function zoomBy(
       )
     );
 
+
   panX=
     cx-
     (cx-panX)*
     (scale/old);
+
 
   panY=
     cy-58-
     (cy-58-panY)*
     (scale/old);
 
-  applyView();
 
+  applyView();
 }
 
 
 function resetView(){
 
   scale=1;
-
   panX=0;
-
   panY=0;
 
   applyView();
-
 }
 
 
-/* =========================================================
-   PANEL MÁY
-   ========================================================= */
+/* ============================================================
+   MACHINE PANEL
+   ============================================================ */
 
 function openPanel(id){
 
@@ -1905,22 +1661,23 @@ function openPanel(id){
     );
 
     return;
-
   }
+
 
   selected=
     machines.find(
       m=>m.id===id
     );
 
+
   const db=
     document.getElementById(
       'deleteMachineBtn'
     );
 
+
   if(db)
-    db.style.display=
-      'inline-flex';
+    db.style.display='inline-flex';
 
 
   document.getElementById(
@@ -1943,14 +1700,9 @@ function openPanel(id){
 
       <option
         value="${s.id}"
-        ${s.id===selected.status_id?'selected':''}>
-
-        ${esc(
-          statusDisplayName(
-            s.name
-          )
-        )}
-
+        ${s.id===selected.status_id?'selected':''}
+      >
+        ${esc(statusDisplayName(s.name))}
       </option>
 
     `).join('');
@@ -1959,7 +1711,6 @@ function openPanel(id){
   document.getElementById(
     'panel'
   ).style.display='block';
-
 }
 
 
@@ -1975,32 +1726,30 @@ function closePanel(){
   if(db)
     db.style.display='none';
 
+
   document.getElementById(
     'panel'
   ).style.display='none';
-
 }
 
-
-/* =========================================================
-   LƯU MÁY
-   ========================================================= */
 
 async function saveMachine(){
 
   if(!selected)return;
 
+
   const name=
     document.getElementById(
       'pname'
-    ).value.trim()
-    ||
+    ).value.trim()||
     selected.name;
+
 
   const code=
     document.getElementById(
       'pcode'
     ).value.trim();
+
 
   const status_id=
     +document.getElementById(
@@ -2017,13 +1766,13 @@ async function saveMachine(){
     error
   }=
   await sb
-    .from('machines')
-    .update({
-      name,
-      code,
-      status_id
-    })
-    .eq('id',selected.id);
+  .from('machines')
+  .update({
+    name,
+    code,
+    status_id
+  })
+  .eq('id',selected.id);
 
 
   if(error){
@@ -2031,12 +1780,10 @@ async function saveMachine(){
     alert(error.message);
 
     return;
-
   }
 
 
-  if(old.name!==name){
-
+  if(old.name!==name)
     await logChange(
       selected.id,
       name,
@@ -2044,19 +1791,14 @@ async function saveMachine(){
       `${old.name} → ${name}`
     );
 
-  }
 
-
-  if(old.code!==code){
-
+  if(old.code!==code)
     await logChange(
       selected.id,
       name,
       'Tên đơn hàng / mã hàng',
       `${old.code||''} → ${code}`
     );
-
-  }
 
 
   if(old.status_id!==status_id){
@@ -2071,58 +1813,53 @@ async function saveMachine(){
         s=>s.id===status_id
       )?.name;
 
+
     await logChange(
       selected.id,
       name,
       'Trạng thái',
       `${a} → ${b}`
     );
-
   }
 
 
-  await loadMachines();
-
-  render();
-
   closePanel();
-
 }
 
 
-/* =========================================================
-   XÓA MÁY
-   ========================================================= */
-
 async function deleteMachine(){
 
-  if(!selected||!canEdit())return;
-
   if(
-    !confirm(
-      'Xóa máy này?'
-    )
+    !selected||
+    !canEdit()
   )return;
+
+
+  if(!confirm('Xóa máy này?'))
+    return;
+
 
   const m={
     ...selected
   };
 
+
   const {
     error
   }=
   await sb
-    .from('machines')
-    .delete()
-    .eq('id',m.id);
+  .from('machines')
+  .delete()
+  .eq('id',m.id);
+
 
   if(error){
 
     alert(error.message);
 
     return;
-
   }
+
 
   await logChange(
     null,
@@ -2131,47 +1868,40 @@ async function deleteMachine(){
     m.name
   );
 
-  await loadMachines();
-
-  render();
 
   closePanel();
-
 }
 
-
-/* =========================================================
-   THÊM MÁY
-   ========================================================= */
 
 async function addMachine(){
 
   if(!canEdit())return;
+
 
   const {
     data,
     error
   }=
   await sb
-    .from('machines')
-    .insert({
-      name:'Máy mới',
-      code:'Chưa nhập',
-      status_id:
-        statuses[0]?.id||1,
-      x:150,
-      y:120
-    })
-    .select()
-    .single();
+  .from('machines')
+  .insert({
+    name:'Máy mới',
+    code:'Chưa nhập',
+    status_id:statuses[0]?.id||1,
+    x:150,
+    y:120
+  })
+  .select()
+  .single();
+
 
   if(error){
 
     alert(error.message);
 
     return;
-
   }
+
 
   await logChange(
     data.id,
@@ -2180,18 +1910,18 @@ async function addMachine(){
     'Tạo mới'
   );
 
+
   await loadMachines();
 
   render();
 
   openPanel(data.id);
-
 }
 
 
-/* =========================================================
-   LỊCH SỬ
-   ========================================================= */
+/* ============================================================
+   HISTORY
+   ============================================================ */
 
 async function logChange(
   machine_id,
@@ -2201,16 +1931,14 @@ async function logChange(
 ){
 
   await sb
-    .from('change_history')
-    .insert({
-      machine_id,
-      machine_name,
-      field,
-      detail,
-      changed_by:
-        currentUser?.id||null
-    });
-
+  .from('change_history')
+  .insert({
+    machine_id,
+    machine_name,
+    field,
+    detail,
+    changed_by:currentUser?.id||null
+  });
 }
 
 
@@ -2223,7 +1951,6 @@ function showHistory(){
   document.getElementById(
     'historyPanel'
   ).style.display='block';
-
 }
 
 
@@ -2232,7 +1959,6 @@ function closeHistory(){
   document.getElementById(
     'historyPanel'
   ).style.display='none';
-
 }
 
 
@@ -2243,14 +1969,15 @@ function renderHistory(){
       'historyList'
     );
 
+
   if(!history.length){
 
     b.innerHTML=
       '<div class="empty-history">Chưa có lịch sử.</div>';
 
     return;
-
   }
+
 
   b.innerHTML=
 
@@ -2279,13 +2006,12 @@ function renderHistory(){
       </div>
 
     `).join('');
-
 }
 
 
-/* =========================================================
-   MÀU TRẠNG THÁI
-   ========================================================= */
+/* ============================================================
+   COLORS
+   ============================================================ */
 
 function showColors(){
 
@@ -2296,15 +2022,14 @@ function showColors(){
     );
 
     return;
-
   }
+
 
   renderColorSettings();
 
   document.getElementById(
     'settingsPanel'
   ).style.display='block';
-
 }
 
 
@@ -2313,7 +2038,6 @@ function closeColors(){
   document.getElementById(
     'settingsPanel'
   ).style.display='none';
-
 }
 
 
@@ -2323,51 +2047,42 @@ function renderColorSettings(){
     'colorSettings'
   ).innerHTML=
 
-    statuses.map(s=>`
+  statuses.map(s=>`
 
-      <div
-        style="
-          padding:10px 0;
-          border-bottom:1px solid #eee">
+    <div style="padding:10px 0;border-bottom:1px solid #eee">
 
-        <div class="color-grid">
+      <div class="color-grid">
 
-          <b>
-            ${esc(s.name)}
-          </b>
+        <b>${esc(s.name)}</b>
 
-          <input
-            type="color"
-            id="bg_${s.id}"
-            value="${s.bg_color}">
+        <input
+          type="color"
+          id="bg_${s.id}"
+          value="${s.bg_color}"
+        >
 
-          <input
-            type="color"
-            id="txt_${s.id}"
-            value="${s.text_color}">
+        <input
+          type="color"
+          id="txt_${s.id}"
+          value="${s.text_color}"
+        >
 
-          <div
-            class="preview"
-            id="pv_${s.id}"
-            style="
-              background:${s.bg_color};
-              color:${s.text_color}">
-
-            Aa
-            ${esc(
-              statusDisplayName(
-                s.name
-              )
-            )}
-
-          </div>
-
+        <div
+          class="preview"
+          id="pv_${s.id}"
+          style="
+            background:${s.bg_color};
+            color:${s.text_color}
+          "
+        >
+          Aa ${esc(statusDisplayName(s.name))}
         </div>
 
       </div>
 
-    `).join('');
+    </div>
 
+  `).join('');
 }
 
 
@@ -2380,8 +2095,8 @@ async function saveColors(){
     );
 
     return;
-
   }
+
 
   for(const s of statuses){
 
@@ -2390,44 +2105,46 @@ async function saveColors(){
         'bg_'+s.id
       ).value;
 
+
     const txt=
       document.getElementById(
         'txt_'+s.id
       ).value;
 
+
     const {
       error
     }=
     await sb
-      .from('statuses')
-      .update({
-        bg_color:bg,
-        text_color:txt
-      })
-      .eq('id',s.id);
+    .from('statuses')
+    .update({
+      bg_color:bg,
+      text_color:txt
+    })
+    .eq('id',s.id);
+
 
     if(error){
 
       alert(error.message);
 
       return;
-
     }
-
   }
+
 
   await loadStatuses();
 
   render();
 
   closeColors();
-
 }
 
 
 async function resetColors(){
 
   if(!canEdit())return;
+
 
   const defaults=[
     ['#20b85a','#ffffff'],
@@ -2445,43 +2162,36 @@ async function resetColors(){
   ){
 
     await sb
-      .from('statuses')
-      .update({
-        bg_color:
-          defaults[i]?.[0]||
-          '#cccccc',
-
-        text_color:
-          defaults[i]?.[1]||
-          '#000000'
-      })
-      .eq(
-        'id',
-        statuses[i].id
-      );
-
+    .from('statuses')
+    .update({
+      bg_color:defaults[i][0],
+      text_color:defaults[i][1]
+    })
+    .eq('id',statuses[i].id);
   }
+
 
   await loadStatuses();
 
   render();
 
   renderColorSettings();
-
 }
 
 
-/* =========================================================
+/* ============================================================
    EXPORT
-   ========================================================= */
+   ============================================================ */
 
 function showExport(){
 
   if(!canEdit())return;
 
+
   document.getElementById(
     'exportFrom'
   ).value='';
+
 
   document.getElementById(
     'exportTo'
@@ -2492,21 +2202,20 @@ function showExport(){
     'exportMachine'
   ).innerHTML=
 
-    '<option value="ALL">Tất cả máy</option>'+
+  '<option value="ALL">Tất cả máy</option>'+
 
-    machines.map(m=>`
+  machines.map(m=>`
 
-      <option value="${m.id}">
-        ${esc(m.name)}
-      </option>
+    <option value="${m.id}">
+      ${esc(m.name)}
+    </option>
 
-    `).join('');
+  `).join('');
 
 
   document.getElementById(
     'exportPanel'
   ).style.display='block';
-
 }
 
 
@@ -2515,7 +2224,6 @@ function closeExport(){
   document.getElementById(
     'exportPanel'
   ).style.display='none';
-
 }
 
 
@@ -2526,10 +2234,12 @@ function doExport(){
       'exportFrom'
     ).value;
 
+
   const to=
     document.getElementById(
       'exportTo'
     ).value;
+
 
   const mid=
     document.getElementById(
@@ -2539,19 +2249,14 @@ function doExport(){
 
   const a=
     from
-      ? new Date(
-          from+
-          'T00:00:00'
-        )
-      : null;
+    ? new Date(from+'T00:00:00')
+    : null;
+
 
   const b=
     to
-      ? new Date(
-          to+
-          'T23:59:59.999'
-        )
-      : null;
+    ? new Date(to+'T23:59:59.999')
+    : null;
 
 
   if(a&&b&&a>b){
@@ -2561,42 +2266,33 @@ function doExport(){
     );
 
     return;
-
   }
 
 
   let rows=
     history
+    .filter(x=>{
 
-      .filter(x=>{
+      const d=
+        new Date(x.created_at);
 
-        const d=
-          new Date(
-            x.created_at
-          );
+      return(
+        (!a||d>=a)&&
+        (!b||d<=b)&&
+        (mid==='ALL'||
+         String(x.machine_id)===mid)
+      );
 
-        return (
-          (!a||d>=a) &&
-          (!b||d<=b) &&
-          (
-            mid==='ALL' ||
-            String(x.machine_id)===mid
-          )
-        );
+    })
+    .map(x=>[
+      new Date(
+        x.created_at
+      ).toLocaleString('vi-VN'),
 
-      })
-
-      .map(x=>[
-        new Date(
-          x.created_at
-        ).toLocaleString('vi-VN'),
-
-        x.machine_name||'',
-
-        x.field||'',
-
-        x.detail||''
-      ]);
+      x.machine_name||'',
+      x.field||'',
+      x.detail||''
+    ]);
 
 
   if(!rows.length){
@@ -2606,7 +2302,6 @@ function doExport(){
     );
 
     return;
-
   }
 
 
@@ -2621,17 +2316,13 @@ function doExport(){
       ],
       ...rows
     ]
-
-    .map(
-      r=>
-        r
-        .map(
-          v=>
-            `"${String(v).replace(/"/g,'""')}"`
-        )
-        .join(',')
+    .map(r=>
+      r
+      .map(v=>
+        `"${String(v).replace(/"/g,'""')}"`
+      )
+      .join(',')
     )
-
     .join('\r\n');
 
 
@@ -2639,40 +2330,33 @@ function doExport(){
     new Blob(
       [csv],
       {
-        type:
-          'text/csv;charset=utf-8'
+        type:'text/csv;charset=utf-8'
       }
     );
 
 
   const url=
-    URL.createObjectURL(
-      blob
-    );
+    URL.createObjectURL(blob);
 
 
   const el=
-    document.createElement(
-      'a'
-    );
+    document.createElement('a');
+
 
   el.href=url;
-
-  el.download=
-    'lich_su_may.csv';
+  el.download='lich_su_may.csv';
 
   el.click();
 
   URL.revokeObjectURL(url);
 
   closeExport();
-
 }
 
 
-/* =========================================================
-   QUẢN LÝ USER
-   ========================================================= */
+/* ============================================================
+   USERS
+   ============================================================ */
 
 async function showUsers(){
 
@@ -2683,17 +2367,17 @@ async function showUsers(){
     );
 
     return;
-
   }
+
 
   document.getElementById(
     'usersPanel'
   ).style.display='block';
 
+
   await loadProfiles();
 
   renderProfiles();
-
 }
 
 
@@ -2702,7 +2386,6 @@ function closeUsers(){
   document.getElementById(
     'usersPanel'
   ).style.display='none';
-
 }
 
 
@@ -2713,11 +2396,10 @@ async function loadProfiles(){
     error
   }=
   await sb
-    .from('profiles')
-    .select(
-      'id,email,role'
-    )
-    .order('email');
+  .from('profiles')
+  .select('id,email,role')
+  .order('email');
+
 
   if(error){
 
@@ -2726,11 +2408,10 @@ async function loadProfiles(){
     profiles=[];
 
     return;
-
   }
 
-  profiles=data||[];
 
+  profiles=data||[];
 }
 
 
@@ -2740,35 +2421,29 @@ function renderProfiles(){
     'userList'
   ).innerHTML=
 
-    profiles.map(p=>`
+  profiles.map(p=>`
 
-      <div class="userrow">
+    <div class="userrow">
 
-        <div class="useremail">
-          ${esc(
-            p.email||p.id
-          )}
-        </div>
-
-        <span
-          class="badge ${
-            p.role==='admin'
-              ? 'admin'
-              : 'viewer'
-          }">
-
-          ${esc(p.role)}
-
-        </span>
-
+      <div class="useremail">
+        ${esc(p.email||p.id)}
       </div>
 
-    `).join('')
+      <span class="badge ${
+        p.role==='admin'
+        ? 'admin'
+        : 'viewer'
+      }">
+        ${esc(p.role)}
+      </span>
 
-    ||
+    </div>
 
-    '<div class="small">Chưa có hồ sơ.</div>';
+  `).join('')
 
+  ||
+
+  '<div class="small">Chưa có hồ sơ.</div>';
 }
 
 
@@ -2777,13 +2452,12 @@ async function createUser(){
   alert(
     'Để giữ bảo mật trên bản Free, hãy tạo user trong Supabase Authentication → Users, sau đó thêm dòng role trong profiles.'
   );
-
 }
 
 
-/* =========================================================
+/* ============================================================
    BOOT
-   ========================================================= */
+   ============================================================ */
 
 loadAll();
 
