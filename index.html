@@ -6,9 +6,7 @@
 <title>Tình trạng máy tại xưởng</title>
 
 <style>
-*{
-  box-sizing:border-box
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -17,10 +15,6 @@ body{
   color:#20242a;
   overflow:hidden
 }
-
-/* =========================================================
-   TOP BAR
-========================================================= */
 
 #top{
   height:58px;
@@ -72,10 +66,6 @@ body{
   color:#fff
 }
 
-/* =========================================================
-   CANVAS
-========================================================= */
-
 #canvas{
   position:absolute;
   top:58px;
@@ -98,10 +88,6 @@ body{
   height:2000px;
   transform-origin:0 0
 }
-
-/* =========================================================
-   MACHINE
-========================================================= */
 
 .machine{
   position:absolute;
@@ -144,26 +130,20 @@ body{
   text-align:center
 }
 
+
 /* =========================================================
-   LEGEND - TỰ ĐỘNG CO GIÃN THEO SỐ LƯỢNG STATUS
-========================================================= */
+   CHÚ THÍCH TRẠNG THÁI
+   TỰ ĐỘNG ĐỔI KÍCH THƯỚC + SỐ CỘT THEO SỐ STATUS
+   ========================================================= */
 
 #legend{
   position:absolute;
   right:18px;
   bottom:18px;
 
-  /*
-    Không còn width cố định 680px.
-    Tự co giãn nhưng không vượt quá 780px.
-  */
-  width:min(780px,calc(100% - 36px));
-
-  /*
-    Có nhiều status thì panel không chiếm hết màn hình.
-    Nếu quá nhiều status sẽ tự scroll.
-  */
-  max-height:calc(100vh - 120px);
+  /* JS sẽ tự thay width theo số trạng thái */
+  width:fit-content;
+  max-width:calc(100vw - 36px);
 
   background:#fff;
   border:1px solid #d9dee7;
@@ -171,80 +151,62 @@ body{
   box-shadow:0 6px 24px #0002;
 
   padding:14px;
+
   z-index:6;
 
-  overflow:auto;
+  transition:
+    width .2s ease,
+    height .2s ease
 }
 
 .legend-title{
   font-size:16px;
   font-weight:700;
-  margin-bottom:10px;
+  margin-bottom:10px
 }
 
-/*
-  TỰ ĐỘNG CHIA CỘT.
-
-  Không cần biết có bao nhiêu status.
-  3 status -> tự xếp đẹp.
-  5 status -> tự xếp đẹp.
-  6 status -> tự xuống hàng.
-  10 status -> tự chia nhiều hàng.
-*/
 .legend-items{
   display:grid;
+  gap:8px;
 
   /*
-    Mỗi ô tối thiểu 125px.
-    Số cột tự tính theo chiều rộng panel.
+     grid-template-columns được JS tự tạo.
+     Không cố định 5 cột nữa.
   */
-  grid-template-columns:repeat(
-    auto-fit,
-    minmax(125px,1fr)
-  );
 
-  gap:9px;
-  width:100%;
+  width:100%
 }
 
 .legend-item{
+  min-width:0;
+  min-height:54px;
+
   border-radius:10px;
-
-  padding:10px 8px;
-
-  min-height:58px;
+  padding:9px 10px;
 
   text-align:center;
   font-weight:700;
   font-size:12px;
-  line-height:1.25;
+  line-height:16px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
+  /*
+     Cho phép tên status dài tự xuống dòng
+  */
+  white-space:normal;
+  overflow-wrap:anywhere;
   word-break:break-word;
 
-  box-shadow:
-    inset 0 0 0 1px #ffffff55,
-    0 1px 3px #0001;
-
-  transition:
-    transform .15s ease,
-    box-shadow .15s ease;
+  box-shadow:inset 0 0 0 1px #ffffff55
 }
 
-.legend-item:hover{
-  transform:translateY(-1px);
-
-  box-shadow:
-    inset 0 0 0 1px #ffffff66,
-    0 3px 8px #0002;
-}
 
 /* =========================================================
-   PANELS
-========================================================= */
+   CÁC PANEL
+   ========================================================= */
 
 #panel,
 #historyPanel,
@@ -357,10 +319,6 @@ select{
   flex:1
 }
 
-/* =========================================================
-   HISTORY
-========================================================= */
-
 .hist{
   border-bottom:1px solid #e8ebef;
   padding:9px 0
@@ -399,10 +357,6 @@ select{
   padding:14px 0;
   text-align:center
 }
-
-/* =========================================================
-   OTHER UI
-========================================================= */
 
 .small{
   font-size:11px;
@@ -546,45 +500,34 @@ select{
   margin-top:6px
 }
 
-/* =========================================================
-   VIEWER GATE
-========================================================= */
-
-#viewerGate{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#0008;
-  z-index:40;
-  align-items:center;
-  justify-content:center
-}
 
 /* =========================================================
    MOBILE
-========================================================= */
+   ========================================================= */
 
 @media(max-width:850px){
 
   #legend{
-    width:calc(100% - 28px);
+    left:14px;
     right:14px;
     bottom:14px;
-    padding:12px;
+
+    width:auto !important;
+    max-width:none;
+
+    padding:12px
   }
 
   .legend-items{
-    grid-template-columns:repeat(
-      auto-fit,
-      minmax(110px,1fr)
-    );
-
-    gap:8px;
+    width:100% !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important
   }
 
   .legend-item{
-    min-height:52px;
+    min-width:0;
+    min-height:50px;
     font-size:11px;
+    padding:8px
   }
 
   #hint{
@@ -605,206 +548,143 @@ select{
     grid-template-columns:1fr 70px 70px 1fr
   }
 }
-
-/* =========================================================
-   SMALL MOBILE
-========================================================= */
-
-@media(max-width:500px){
-
-  #top{
-    padding:0 10px;
-    gap:7px
-  }
-
-  #top h1{
-    font-size:15px;
-    margin-right:6px
-  }
-
-  #top .btn{
-    padding:8px 10px;
-    font-size:12px
-  }
-
-  #legend{
-    width:calc(100% - 20px);
-    right:10px;
-    bottom:10px;
-    max-height:45vh;
-  }
-
-  .legend-title{
-    font-size:14px;
-  }
-
-  .legend-items{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .legend-item{
-    min-height:50px;
-    font-size:11px;
-  }
-}
 </style>
 </head>
 
 <body>
 
-<!-- =======================================================
-     TOP BAR
-======================================================= -->
-
 <div id="top">
 
-  <h1>🏭 Tình trạng máy tại xưởng</h1>
+<h1>🏭 Tình trạng máy tại xưởng</h1>
 
-  <button
-    class="btn admin-only"
-    id="addBtn"
-    onclick="addMachine()"
-  >
-    ＋ Thêm máy
-  </button>
+<button
+  class="btn admin-only"
+  id="addBtn"
+  onclick="addMachine()">
+  ＋ Thêm máy
+</button>
 
-  <button
-    class="btn admin-only"
-    id="exportBtn"
-    onclick="showExport()"
-  >
-    ↓ Xuất Excel
-  </button>
+<button
+  class="btn admin-only"
+  id="exportBtn"
+  onclick="showExport()">
+  ↓ Xuất Excel
+</button>
 
-  <button
-    class="btn admin-only"
-    id="historyBtn"
-    onclick="showHistory()"
-  >
-    ☷ Lịch sử
-  </button>
+<button
+  class="btn admin-only"
+  id="historyBtn"
+  onclick="showHistory()">
+  ☷ Lịch sử
+</button>
 
-  <button
-    class="btn admin-only"
-    id="colorBtn"
-    onclick="showColors()"
-  >
-    🎨 Màu trạng thái
-  </button>
+<button
+  class="btn admin-only"
+  id="colorBtn"
+  onclick="showColors()">
+  🎨 Màu trạng thái
+</button>
 
-  <button
-    class="btn dark"
-    id="authBtn"
-    onclick="openAuth()"
-  >
-    🔐 Đăng nhập Admin
-  </button>
+<button
+  class="btn dark"
+  id="authBtn"
+  onclick="openAuth()">
+  🔐 Đăng nhập Admin
+</button>
 
 </div>
 
-<!-- =======================================================
-     CANVAS
-======================================================= -->
 
 <div id="canvas">
 
   <div id="world"></div>
 
-  <!-- Legend tự động render -->
   <div id="legend"></div>
 
 </div>
 
-<!-- =======================================================
-     STATUS BAR
-======================================================= -->
 
 <div id="statusbar">
   Đang kết nối…
 </div>
 
-<!-- =======================================================
-     ZOOM
-======================================================= -->
 
 <div id="zoom">
 
   <button
     class="zbtn"
-    onclick="zoomBy(1.15)"
-  >
+    onclick="zoomBy(1.15)">
     ＋
   </button>
 
   <button
     class="zbtn"
-    onclick="zoomBy(.87)"
-  >
+    onclick="zoomBy(.87)">
     −
   </button>
 
   <button
     class="zbtn"
-    onclick="resetView()"
-  >
+    onclick="resetView()">
     ⌂
   </button>
 
 </div>
 
-<div id="hint">
-  Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa
-</div>
-
-<!-- =======================================================
-     MACHINE PANEL
-======================================================= -->
+<!-- PANEL MÁY -->
 
 <div id="panel">
 
   <div class="panel-head">
 
-    <h2>Thông tin máy</h2>
+    <h2>
+      Thông tin máy
+    </h2>
 
     <button
       class="closex"
-      onclick="closePanel()"
-    >
+      onclick="closePanel()">
       ×
     </button>
 
   </div>
 
-  <label>Tên máy</label>
+  <label>
+    Tên máy
+  </label>
+
   <input id="pname">
 
-  <label>Tên đơn hàng / mã hàng</label>
+  <label>
+    Tên đơn hàng / mã hàng
+  </label>
+
   <input id="pcode">
 
-  <label>Trạng thái</label>
+  <label>
+    Trạng thái
+  </label>
+
   <select id="pstatus"></select>
 
   <div class="row">
 
     <button
       class="btn primary"
-      onclick="saveMachine()"
-    >
+      onclick="saveMachine()">
       Lưu
     </button>
 
     <button
       class="btn danger admin-only"
       id="deleteMachineBtn"
-      onclick="deleteMachine()"
-    >
+      onclick="deleteMachine()">
       🗑 Xóa máy
     </button>
 
     <button
       class="btn"
-      onclick="closePanel()"
-    >
+      onclick="closePanel()">
       Đóng
     </button>
 
@@ -812,20 +692,20 @@ select{
 
 </div>
 
-<!-- =======================================================
-     HISTORY PANEL
-======================================================= -->
+
+<!-- HISTORY -->
 
 <div id="historyPanel">
 
   <div class="panel-head">
 
-    <h2>Lịch sử thay đổi</h2>
+    <h2>
+      Lịch sử thay đổi
+    </h2>
 
     <button
       class="closex"
-      onclick="closeHistory()"
-    >
+      onclick="closeHistory()">
       ×
     </button>
 
@@ -835,20 +715,20 @@ select{
 
 </div>
 
-<!-- =======================================================
-     COLOR SETTINGS
-======================================================= -->
+
+<!-- COLORS -->
 
 <div id="settingsPanel">
 
   <div class="panel-head">
 
-    <h2>Tùy chỉnh màu nền + màu chữ</h2>
+    <h2>
+      Tùy chỉnh màu nền + màu chữ
+    </h2>
 
     <button
       class="closex"
-      onclick="closeColors()"
-    >
+      onclick="closeColors()">
       ×
     </button>
 
@@ -874,8 +754,7 @@ select{
       margin:12px 0 2px;
       font-size:11px;
       color:#666
-    "
-  >
+    ">
 
     <b>Trạng thái</b>
     <b>Nền</b>
@@ -890,15 +769,13 @@ select{
 
     <button
       class="btn primary"
-      onclick="saveColors()"
-    >
+      onclick="saveColors()">
       Lưu màu
     </button>
 
     <button
       class="btn"
-      onclick="resetColors()"
-    >
+      onclick="resetColors()">
       Mặc định
     </button>
 
@@ -906,58 +783,67 @@ select{
 
 </div>
 
-<!-- =======================================================
-     EXPORT PANEL
-======================================================= -->
+
+<!-- EXPORT -->
 
 <div id="exportPanel">
 
   <div class="panel-head">
 
-    <h2>Xuất lịch sử Excel</h2>
+    <h2>
+      Xuất lịch sử Excel
+    </h2>
 
     <button
       class="closex"
-      onclick="closeExport()"
-    >
+      onclick="closeExport()">
       ×
     </button>
 
   </div>
 
-  <label>Từ ngày</label>
+  <label>
+    Từ ngày
+  </label>
+
   <input
     type="date"
-    id="exportFrom"
-  >
+    id="exportFrom">
 
-  <label>Đến ngày</label>
+  <label>
+    Đến ngày
+  </label>
+
   <input
     type="date"
-    id="exportTo"
-  >
+    id="exportTo">
 
-  <label>Máy</label>
+  <label>
+    Máy
+  </label>
+
   <select id="exportMachine"></select>
 
   <div class="note">
-    CSV UTF-8 có BOM, mở trực tiếp bằng Excel.
+
+    CSV UTF-8 có BOM,
+    mở trực tiếp bằng Excel.
+
     Có thể lọc theo ngày và máy.
+
   </div>
 
   <div class="row">
 
     <button
       class="btn primary"
-      onclick="doExport()"
-    >
+      onclick="doExport()">
       Xuất Excel
     </button>
 
     <button
       class="btn"
-      onclick="closeExport()"
-    >
+      onclick="closeExport()">
       Đóng
     </button>
 
@@ -965,23 +851,22 @@ select{
 
 </div>
 
-<!-- =======================================================
-     USERS PANEL
-======================================================= -->
+
+<!-- USERS -->
 
 <div
   id="usersPanel"
-  style="display:none!important"
->
+  style="display:none!important">
 
   <div class="panel-head">
 
-    <h2>Người dùng</h2>
+    <h2>
+      Người dùng
+    </h2>
 
     <button
       class="closex"
-      onclick="closeUsers()"
-    >
+      onclick="closeUsers()">
       ×
     </button>
 
@@ -990,28 +875,34 @@ select{
   <div class="small">
 
     Tạo tài khoản Viewer/Admin trực tiếp từ đây.
+
     Mật khẩu được Supabase Auth quản lý;
+
     không lưu mật khẩu trong database ứng dụng.
 
   </div>
 
-  <label>Email</label>
+  <label>
+    Email
+  </label>
 
   <input
     id="newEmail"
     type="email"
-    placeholder="viewer@congty.com"
-  >
+    placeholder="viewer@congty.com">
 
-  <label>Mật khẩu tạm</label>
+  <label>
+    Mật khẩu tạm
+  </label>
 
   <input
     id="newPassword"
     type="password"
-    placeholder="Tối thiểu 6 ký tự"
-  >
+    placeholder="Tối thiểu 6 ký tự">
 
-  <label>Quyền</label>
+  <label>
+    Quyền
+  </label>
 
   <select id="newRole">
 
@@ -1029,8 +920,7 @@ select{
 
     <button
       class="btn primary"
-      onclick="createUser()"
-    >
+      onclick="createUser()">
       Tạo người dùng
     </button>
 
@@ -1038,8 +928,8 @@ select{
 
   <div
     id="userError"
-    class="error"
-  ></div>
+    class="error">
+  </div>
 
   <hr>
 
@@ -1047,11 +937,20 @@ select{
 
 </div>
 
-<!-- =======================================================
-     VIEWER GATE
-======================================================= -->
 
-<div id="viewerGate">
+<!-- VIEWER -->
+
+<div
+  id="viewerGate"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#0008;
+    z-index:40;
+    align-items:center;
+    justify-content:center
+  ">
 
   <div
     style="
@@ -1060,15 +959,13 @@ select{
       border-radius:12px;
       padding:20px;
       box-shadow:0 10px 40px #0005
-    "
-  >
+    ">
 
     <h2
       style="
         margin:0 0 8px;
         font-size:18px
-      "
-    >
+      ">
       👁 Chế độ xem
     </h2>
 
@@ -1077,17 +974,20 @@ select{
         font-size:13px;
         color:#666;
         margin-bottom:12px
-      "
-    >
+      ">
+
       Nhập mã xem chung để xem sơ đồ.
-      Không cần tài khoản; chế độ này chỉ được xem.
+
+      Không cần tài khoản;
+
+      chế độ này chỉ được xem.
+
     </div>
 
     <input
       id="viewerCode"
       type="password"
-      placeholder="Mã xem"
-    >
+      placeholder="Mã xem">
 
     <div
       id="viewerError"
@@ -1096,15 +996,14 @@ select{
         font-size:12px;
         min-height:18px;
         margin-top:7px
-      "
-    ></div>
+      ">
+    </div>
 
     <div class="row">
 
       <button
         class="btn primary"
-        onclick="unlockViewer()"
-      >
+        onclick="unlockViewer()">
         Xem sơ đồ
       </button>
 
@@ -1114,61 +1013,62 @@ select{
 
 </div>
 
-<!-- =======================================================
-     LOGIN
-======================================================= -->
 
 <div id="loginOverlay"></div>
+
+
+<!-- LOGIN -->
 
 <div id="loginPanel">
 
   <div class="panel-head">
 
-    <h2>🔐 Đăng nhập</h2>
+    <h2>
+      🔐 Đăng nhập
+    </h2>
 
     <button
       class="closex"
-      onclick="closeAuth()"
-    >
+      onclick="closeAuth()">
       ×
     </button>
 
   </div>
 
-  <label>Email</label>
+  <label>
+    Email
+  </label>
 
   <input
     id="loginEmail"
     type="email"
-    autocomplete="username"
-  >
+    autocomplete="username">
 
-  <label>Mật khẩu</label>
+  <label>
+    Mật khẩu
+  </label>
 
   <input
     id="loginPassword"
     type="password"
-    autocomplete="current-password"
-  >
+    autocomplete="current-password">
 
   <div
     id="loginError"
-    class="error"
-  ></div>
+    class="error">
+  </div>
 
   <div class="row">
 
     <button
       class="btn primary"
-      onclick="login()"
-    >
+      onclick="login()">
       Đăng nhập
     </button>
 
     <button
       class="btn"
-      onclick="closeAuth()"
-    >
+      onclick="closeAuth()">
       Hủy
     </button>
 
@@ -1177,24 +1077,23 @@ select{
   <div class="note">
 
     Tài khoản được quản lý bởi Supabase Auth.
+
     Admin/Viewer được phân quyền bằng database RLS,
+
     không chỉ bằng giao diện.
 
   </div>
 
 </div>
 
-<!-- =======================================================
-     SUPABASE
-======================================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
 /* =========================================================
-   SUPABASE CONFIG
-========================================================= */
+   SUPABASE
+   ========================================================= */
 
 const SUPABASE_URL =
   'https://maemqzfpsxczklixxaic.supabase.co';
@@ -1202,10 +1101,12 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   'sb_publishable_AfYltiueRPDKEicNVBTaiA__guFg0o_';
 
+
 const configured =
   SUPABASE_URL.startsWith('https://') &&
   !SUPABASE_URL.includes('YOUR_') &&
   !SUPABASE_KEY.includes('YOUR_');
+
 
 const sb =
   configured
@@ -1223,44 +1124,40 @@ const sb =
     : null;
 
 
-/* =========================================================
-   GLOBAL DATA
-========================================================= */
+let machines=[];
+let statuses=[];
+let history=[];
+let profiles=[];
 
-let machines = [];
-let statuses = [];
-let history = [];
-let profiles = [];
+let selected=null;
 
-let selected = null;
+let scale=1;
+let panX=0;
+let panY=0;
 
-let scale = 1;
-let panX = 0;
-let panY = 0;
+let drag=null;
+let pan=null;
 
-let drag = null;
-let pan = null;
+let currentUser=null;
+let currentRole=null;
 
-let currentUser = null;
-let currentRole = null;
-
-const world =
+const world=
   document.getElementById('world');
 
-const canvas =
+const canvas=
   document.getElementById('canvas');
 
 
 /* =========================================================
-   HELPERS
-========================================================= */
+   HELPER
+   ========================================================= */
 
 function esc(x){
 
-  return String(x ?? '')
+  return String(x??'')
     .replace(
       /[&<>"']/g,
-      a => ({
+      a=>({
         '&':'&amp;',
         '<':'&lt;',
         '>':'&gt;',
@@ -1274,20 +1171,17 @@ function esc(x){
 
 function canEdit(){
 
-  return currentRole === 'admin';
+  return currentRole==='admin';
 
 }
 
 
-function setStatus(
-  text,
-  kind='online'
-){
+function setStatus(text,kind='online'){
 
-  const e =
+  const e=
     document.getElementById('statusbar');
 
-  e.innerHTML =
+  e.innerHTML=
     `<span class="badge ${kind}">
       ${esc(text)}
     </span>`;
@@ -1303,71 +1197,63 @@ function closeAll(){
     'settingsPanel',
     'exportPanel',
     'usersPanel'
-  ].forEach(id => {
-
-    document.getElementById(id)
-      .style.display = 'none';
-
-  });
+  ].forEach(
+    id=>
+      document.getElementById(id).style.display='none'
+  );
 
 }
 
 
-/*
-  Nếu tên status trong Supabase là
-  "Thiếu thiết bị" thì giao diện hiển thị
-  "Thiếu TB & NL".
-*/
 function statusDisplayName(name){
 
-  return String(name ?? '').trim()
-    === 'Thiếu thiết bị'
-      ? 'Thiếu TB & NL'
-      : name;
+  return String(name??'').trim()==='Thiếu thiết bị'
+    ? 'Thiếu TB & NL'
+    : name;
 
 }
 
 
 /* =========================================================
-   RENDER MACHINES + LEGEND
-========================================================= */
+   RENDER
+   ========================================================= */
 
 function render(){
 
-  world.innerHTML = '';
+  world.innerHTML='';
 
-  machines.forEach(m => {
+  machines.forEach(m=>{
 
-    const st =
+    const st=
       statuses.find(
-        s => s.id === m.status_id
-      ) || statuses[0];
+        s=>s.id===m.status_id
+      )||statuses[0];
 
-    if(!st) return;
+    if(!st)return;
 
-    const d =
+    const d=
       document.createElement('div');
 
-    d.className = 'machine';
+    d.className='machine';
 
-    d.dataset.id = m.id;
+    d.dataset.id=m.id;
 
-    d.style.left = m.x + 'px';
-    d.style.top = m.y + 'px';
+    d.style.left=m.x+'px';
+    d.style.top=m.y+'px';
 
-    d.style.background =
-      st.bg_color || '#cccccc';
+    d.style.background=
+      st.bg_color;
 
-    d.style.color =
-      st.text_color || '#000000';
+    d.style.color=
+      st.text_color;
 
-    d.innerHTML = `
+    d.innerHTML=`
       <div class="name">
         ${esc(m.name)}
       </div>
 
       <div class="code">
-        ${esc(m.code || '')}
+        ${esc(m.code||'')}
       </div>
 
       <div class="status">
@@ -1375,19 +1261,19 @@ function render(){
       </div>
     `;
 
-    d.onmousedown = e => {
+    d.onmousedown=e=>{
 
-      if(!canEdit()) return;
+      if(!canEdit())return;
 
       startDrag(e,m);
 
     };
 
-    d.ondblclick = e => {
+    d.ondblclick=e=>{
 
       e.stopPropagation();
 
-      if(!canEdit()) return;
+      if(!canEdit())return;
 
       openPanel(m.id);
 
@@ -1398,37 +1284,161 @@ function render(){
   });
 
 
-  /* =======================================================
-     LEGEND TỰ ĐỘNG
-  ======================================================= */
+  /*
+     ========================================================
+     CHÚ THÍCH TỰ ĐỘNG
 
-  const legend =
+     Không còn cố định 5 cột.
+
+     Số status -> số cột:
+
+     1  = 1
+     2  = 2
+     3  = 3
+     4  = 4
+     5  = 3
+     6  = 3
+     7  = 4
+     8  = 4
+     9  = 3
+     10 = 5
+     11+ = 5
+
+     Sau đó JS tự tính chiều rộng khung.
+     ========================================================
+  */
+
+  const legend=
     document.getElementById('legend');
 
-  legend.innerHTML = `
+  const count=
+    statuses.length;
+
+
+  let columns;
+
+  if(count<=1){
+
+    columns=1;
+
+  }else if(count===2){
+
+    columns=2;
+
+  }else if(count===3){
+
+    columns=3;
+
+  }else if(count===4){
+
+    columns=4;
+
+  }else if(count===5){
+
+    columns=3;
+
+  }else if(count===6){
+
+    columns=3;
+
+  }else if(count===7){
+
+    columns=4;
+
+  }else if(count===8){
+
+    columns=4;
+
+  }else if(count===9){
+
+    columns=3;
+
+  }else{
+
+    columns=5;
+
+  }
+
+
+  /*
+     Kích thước mỗi ô.
+     Khung sẽ lớn nhỏ theo số cột,
+     chứ không còn width:680px cố định.
+  */
+
+  const itemWidth=145;
+  const gap=8;
+  const padding=28;
+
+  let legendWidth=
+    columns*itemWidth+
+    (columns-1)*gap+
+    padding;
+
+
+  /*
+     Không cho vượt quá màn hình.
+  */
+
+  const maxWidth=
+    Math.min(
+      680,
+      window.innerWidth-36
+    );
+
+  legendWidth=
+    Math.min(
+      legendWidth,
+      maxWidth
+    );
+
+
+  /*
+     Nếu màn hình nhỏ thì để CSS mobile
+     tự xử lý.
+  */
+
+  if(window.innerWidth<=850){
+
+    legend.style.width='';
+
+  }else{
+
+    legend.style.width=
+      legendWidth+'px';
+
+  }
+
+
+  legend.innerHTML=`
 
     <div class="legend-title">
       Chú thích trạng thái máy
     </div>
 
-    <div class="legend-items">
+    <div
+      class="legend-items"
+      style="
+        grid-template-columns:
+          repeat(${columns},minmax(0,1fr));
+      "
+    >
 
-      ${
-        statuses.map(s => `
+      ${statuses.map(s=>`
 
-          <div
-            class="legend-item"
-            style="
-              background:${esc(s.bg_color || '#ccc')};
-              color:${esc(s.text_color || '#000')}
-            "
-            title="${esc(s.name)}"
-          >
-            ${esc(statusDisplayName(s.name))}
-          </div>
+        <div
+          class="legend-item"
+          style="
+            background:${s.bg_color};
+            color:${s.text_color};
+          "
+        >
 
-        `).join('')
-      }
+          ${esc(statusDisplayName(s.name))}
+
+        </div>
+
+      `).join('')}
 
     </div>
 
@@ -1439,7 +1449,7 @@ function render(){
 
 /* =========================================================
    LOAD DATA
-========================================================= */
+   ========================================================= */
 
 async function loadAll(){
 
@@ -1454,7 +1464,7 @@ async function loadAll(){
 
     document.getElementById(
       'loginError'
-    ).textContent =
+    ).textContent=
       'Bạn cần điền SUPABASE_URL và SUPABASE_KEY trong code trước.';
 
     return;
@@ -1464,13 +1474,16 @@ async function loadAll(){
 
   const {
     data:{session}
-  } =
+  }=
     await sb.auth.getSession();
 
-  currentUser =
-    session?.user || null;
+
+  currentUser=
+    session?.user||null;
+
 
   await loadProfile();
+
 
   await Promise.all([
     loadStatuses(),
@@ -1478,11 +1491,13 @@ async function loadAll(){
     loadHistory()
   ]);
 
+
   updateAuthUI();
 
   render();
 
   subscribeRealtime();
+
 
   setStatus(
     currentUser
@@ -1498,25 +1513,22 @@ async function loadAll(){
 }
 
 
-/* =========================================================
-   PROFILE
-========================================================= */
-
 async function loadProfile(){
 
-  currentRole = null;
+  currentRole=null;
 
-  if(!currentUser) return;
+  if(!currentUser)return;
 
   const {
     data,
     error
-  } =
+  }=
     await sb
       .from('profiles')
       .select('role')
       .eq('id',currentUser.id)
       .maybeSingle();
+
 
   if(error){
 
@@ -1526,46 +1538,24 @@ async function loadProfile(){
 
   }
 
-  currentRole =
-    data?.role || 'viewer';
+
+  currentRole=
+    data?.role||'viewer';
 
 }
 
-
-/* =========================================================
-   LOAD STATUSES
-========================================================= */
-
-/*
-  QUAN TRỌNG:
-  Dùng sort_order của Supabase.
-
-  Bạn thêm status mới chỉ cần đặt
-  sort_order 6, 7, 8...
-  website sẽ tự sắp xếp.
-*/
 
 async function loadStatuses(){
 
   const {
     data,
     error
-  } =
+  }=
     await sb
       .from('statuses')
       .select('*')
-      .order(
-        'sort_order',
-        {
-          ascending:true
-        }
-      )
-      .order(
-        'id',
-        {
-          ascending:true
-        }
-      );
+      .order('id');
+
 
   if(error){
 
@@ -1575,25 +1565,23 @@ async function loadStatuses(){
 
   }
 
-  statuses = data || [];
+
+  statuses=data||[];
 
 }
 
-
-/* =========================================================
-   LOAD MACHINES
-========================================================= */
 
 async function loadMachines(){
 
   const {
     data,
     error
-  } =
+  }=
     await sb
       .from('machines')
       .select('*')
       .order('id');
+
 
   if(error){
 
@@ -1603,21 +1591,18 @@ async function loadMachines(){
 
   }
 
-  machines = data || [];
+
+  machines=data||[];
 
 }
 
-
-/* =========================================================
-   LOAD HISTORY
-========================================================= */
 
 async function loadHistory(){
 
   const {
     data,
     error
-  } =
+  }=
     await sb
       .from('change_history')
       .select('*')
@@ -1629,6 +1614,7 @@ async function loadHistory(){
       )
       .limit(1000);
 
+
   if(error){
 
     console.error(error);
@@ -1637,25 +1623,28 @@ async function loadHistory(){
 
   }
 
-  history = data || [];
+
+  history=data||[];
 
 }
 
 
 /* =========================================================
    REALTIME
-========================================================= */
+   ========================================================= */
 
-let realtimeChannel = null;
+let realtimeChannel=null;
+
 
 function subscribeRealtime(){
 
-  if(!sb || realtimeChannel)
-    return;
+  if(!sb||realtimeChannel)return;
 
-  realtimeChannel =
+
+  realtimeChannel=
     sb
       .channel('machine-board')
+
 
       .on(
         'postgres_changes',
@@ -1664,7 +1653,7 @@ function subscribeRealtime(){
           schema:'public',
           table:'machines'
         },
-        async () => {
+        async()=>{
 
           await loadMachines();
 
@@ -1673,6 +1662,7 @@ function subscribeRealtime(){
         }
       )
 
+
       .on(
         'postgres_changes',
         {
@@ -1680,7 +1670,7 @@ function subscribeRealtime(){
           schema:'public',
           table:'statuses'
         },
-        async () => {
+        async()=>{
 
           await loadStatuses();
 
@@ -1689,6 +1679,7 @@ function subscribeRealtime(){
         }
       )
 
+
       .on(
         'postgres_changes',
         {
@@ -1696,14 +1687,14 @@ function subscribeRealtime(){
           schema:'public',
           table:'change_history'
         },
-        async () => {
+        async()=>{
 
           await loadHistory();
 
           if(
             document.getElementById(
               'historyPanel'
-            ).style.display === 'block'
+            ).style.display==='block'
           ){
 
             renderHistory();
@@ -1713,7 +1704,8 @@ function subscribeRealtime(){
         }
       )
 
-      .subscribe(status => {
+
+      .subscribe(status=>{
 
         console.log(
           'Realtime:',
@@ -1727,18 +1719,19 @@ function subscribeRealtime(){
 
 /* =========================================================
    AUTH UI
-========================================================= */
+   ========================================================= */
 
 function updateAuthUI(){
 
-  const auth =
+  const auth=
     document.getElementById('authBtn');
 
-  const isAdmin =
+  const isAdmin=
     !!currentUser &&
-    currentRole === 'admin';
+    currentRole==='admin';
 
-  auth.textContent =
+
+  auth.textContent=
     isAdmin
       ? '👑 Admin • Đăng xuất'
       : '🔐 Đăng nhập Admin';
@@ -1750,17 +1743,19 @@ function updateAuthUI(){
     'historyBtn',
     'colorBtn',
     'deleteMachineBtn'
-  ].forEach(id => {
+  ].forEach(id=>{
 
-    const e =
+    const e=
       document.getElementById(id);
 
-    if(!e) return;
+    if(!e)return;
+
 
     e.classList.toggle(
       'admin-only',
       !isAdmin
     );
+
 
     if(isAdmin){
 
@@ -1783,12 +1778,13 @@ function updateAuthUI(){
   });
 
 
-  const hint =
+  const hint=
     document.getElementById('hint');
+
 
   if(hint){
 
-    hint.textContent =
+    hint.textContent=
       isAdmin
         ? 'Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa'
         : 'Kéo nền • Cuộn để zoom';
@@ -1798,15 +1794,11 @@ function updateAuthUI(){
 }
 
 
-/* =========================================================
-   AUTH
-========================================================= */
-
 function openAuth(){
 
   if(
     currentUser &&
-    currentRole === 'admin'
+    currentRole==='admin'
   ){
 
     sb.auth.signOut();
@@ -1829,11 +1821,13 @@ function openAuth(){
 
   document.getElementById(
     'loginPanel'
-  ).style.display = 'block';
+  ).style.display='block';
+
 
   document.getElementById(
     'loginOverlay'
-  ).style.display = 'block';
+  ).style.display='block';
+
 
   document.getElementById(
     'loginEmail'
@@ -1846,40 +1840,42 @@ function closeAuth(){
 
   document.getElementById(
     'loginPanel'
-  ).style.display = 'none';
+  ).style.display='none';
+
 
   document.getElementById(
     'loginOverlay'
-  ).style.display = 'none';
+  ).style.display='none';
 
 }
 
 
 /* =========================================================
    VIEWER
-========================================================= */
+   ========================================================= */
 
-const VIEWER_CODE = '123456';
+const VIEWER_CODE='123456';
 
-let viewerUnlocked =
+let viewerUnlocked=
   sessionStorage.getItem(
     'viewerUnlocked'
-  ) === '1';
+  )==='1';
 
 
 function showViewerGate(){
 
-  if(viewerUnlocked)
-    return;
+  if(viewerUnlocked)return;
 
-  const g =
+
+  const g=
     document.getElementById(
       'viewerGate'
     );
 
+
   if(g){
 
-    g.style.display = 'flex';
+    g.style.display='flex';
 
     document.getElementById(
       'viewerCode'
@@ -1892,23 +1888,26 @@ function showViewerGate(){
 
 function unlockViewer(){
 
-  const v =
+  const v=
     document.getElementById(
       'viewerCode'
     ).value;
 
-  if(v === VIEWER_CODE){
 
-    viewerUnlocked = true;
+  if(v===VIEWER_CODE){
+
+    viewerUnlocked=true;
 
     sessionStorage.setItem(
       'viewerUnlocked',
       '1'
     );
 
+
     document.getElementById(
       'viewerGate'
-    ).style.display = 'none';
+    ).style.display='none';
+
 
     updateAuthUI();
 
@@ -1919,7 +1918,7 @@ function unlockViewer(){
 
   document.getElementById(
     'viewerError'
-  ).textContent =
+  ).textContent=
     'Mã xem không đúng.';
 
 }
@@ -1927,30 +1926,34 @@ function unlockViewer(){
 
 /* =========================================================
    LOGIN
-========================================================= */
+   ========================================================= */
 
 async function login(){
 
-  const email =
+  const email=
     document.getElementById(
       'loginEmail'
     ).value.trim();
 
-  const password =
+
+  const password=
     document.getElementById(
       'loginPassword'
     ).value;
 
-  const e =
+
+  const e=
     document.getElementById(
       'loginError'
     );
 
-  e.textContent = '';
 
-  if(!email || !password){
+  e.textContent='';
 
-    e.textContent =
+
+  if(!email||!password){
+
+    e.textContent=
       'Nhập email và mật khẩu.';
 
     return;
@@ -1961,7 +1964,7 @@ async function login(){
   const {
     data,
     error
-  } =
+  }=
     await sb.auth.signInWithPassword({
       email,
       password
@@ -1970,7 +1973,7 @@ async function login(){
 
   if(error){
 
-    e.textContent =
+    e.textContent=
       error.message;
 
     return;
@@ -1978,17 +1981,18 @@ async function login(){
   }
 
 
-  currentUser =
-    data?.user || null;
+  currentUser=
+    data?.user||null;
+
 
   await loadProfile();
 
   updateAuthUI();
 
 
-  if(currentRole !== 'admin'){
+  if(currentRole!=='admin'){
 
-    e.textContent =
+    e.textContent=
       'Tài khoản này chưa được cấp quyền admin trong bảng profiles.';
 
     return;
@@ -1998,13 +2002,16 @@ async function login(){
 
   closeAuth();
 
+
   await Promise.all([
     loadStatuses(),
     loadMachines(),
     loadHistory()
   ]);
 
+
   render();
+
 
   setStatus(
     'Admin — realtime',
@@ -2014,19 +2021,15 @@ async function login(){
 }
 
 
-/* =========================================================
-   AUTH STATE CHANGE
-========================================================= */
-
 sb?.auth.onAuthStateChange(
-  async (event,session) => {
+  async(event,session)=>{
 
     if(
-      event === 'SIGNED_IN' &&
+      event==='SIGNED_IN' &&
       session?.user
     ){
 
-      currentUser =
+      currentUser=
         session.user;
 
       await loadProfile();
@@ -2036,11 +2039,11 @@ sb?.auth.onAuthStateChange(
     }
 
 
-    if(event === 'SIGNED_OUT'){
+    if(event==='SIGNED_OUT'){
 
-      currentUser = null;
+      currentUser=null;
 
-      currentRole = null;
+      currentRole=null;
 
       closeAll();
 
@@ -2058,20 +2061,17 @@ sb?.auth.onAuthStateChange(
 
 
 /* =========================================================
-   MACHINE DRAG
-========================================================= */
+   MACHINE BOARD
+   ========================================================= */
 
 function startDrag(e,m){
 
-  if(
-    !canEdit() ||
-    e.button !== 0
-  )
-    return;
+  if(!canEdit()||e.button!==0)return;
 
   e.stopPropagation();
 
-  drag = {
+
+  drag={
     m,
     sx:e.clientX,
     sy:e.clientY,
@@ -2079,10 +2079,12 @@ function startDrag(e,m){
     oy:m.y
   };
 
-  document.onmousemove =
+
+  document.onmousemove=
     moveDrag;
 
-  document.onmouseup =
+
+  document.onmouseup=
     endDrag;
 
 }
@@ -2090,21 +2092,22 @@ function startDrag(e,m){
 
 function moveDrag(e){
 
-  if(!drag)
-    return;
+  if(!drag)return;
 
-  drag.m.x =
-    drag.ox +
-    (e.clientX - drag.sx) /
-    scale;
 
-  drag.m.y =
-    drag.oy +
-    (e.clientY - drag.sy) /
+  drag.m.x=
+    drag.ox+
+    (e.clientX-drag.sx)/
     scale;
 
 
-  const d =
+  drag.m.y=
+    drag.oy+
+    (e.clientY-drag.sy)/
+    scale;
+
+
+  const d=
     document.querySelector(
       `[data-id="${drag.m.id}"]`
     );
@@ -2112,11 +2115,11 @@ function moveDrag(e){
 
   if(d){
 
-    d.style.left =
-      drag.m.x + 'px';
+    d.style.left=
+      drag.m.x+'px';
 
-    d.style.top =
-      drag.m.y + 'px';
+    d.style.top=
+      drag.m.y+'px';
 
   }
 
@@ -2125,22 +2128,21 @@ function moveDrag(e){
 
 async function endDrag(){
 
-  if(!drag)
-    return;
+  if(!drag)return;
 
-  const m =
-    drag.m;
 
-  drag = null;
+  const m=drag.m;
 
-  document.onmousemove = null;
+  drag=null;
 
-  document.onmouseup = null;
+
+  document.onmousemove=null;
+  document.onmouseup=null;
 
 
   const {
     error
-  } =
+  }=
     await sb
       .from('machines')
       .update({
@@ -2168,19 +2170,15 @@ async function endDrag(){
 }
 
 
-/* =========================================================
-   PAN CANVAS
-========================================================= */
-
-canvas.onmousedown = e => {
+canvas.onmousedown=e=>{
 
   if(
-    e.target !== canvas &&
-    e.target !== world
-  )
-    return;
+    e.target!==canvas &&
+    e.target!==world
+  )return;
 
-  pan = {
+
+  pan={
     sx:e.clientX,
     sy:e.clientY,
     ox:panX,
@@ -2188,48 +2186,45 @@ canvas.onmousedown = e => {
   };
 
 
-  document.onmousemove = e => {
+  document.onmousemove=e=>{
 
-    panX =
-      pan.ox +
-      e.clientX -
+    panX=
+      pan.ox+
+      e.clientX-
       pan.sx;
 
-    panY =
-      pan.oy +
-      e.clientY -
+
+    panY=
+      pan.oy+
+      e.clientY-
       pan.sy;
+
 
     applyView();
 
   };
 
 
-  document.onmouseup = () => {
+  document.onmouseup=()=>{
 
-    document.onmousemove = null;
+    document.onmousemove=null;
+    document.onmouseup=null;
 
-    document.onmouseup = null;
-
-    pan = null;
+    pan=null;
 
   };
 
 };
 
 
-/* =========================================================
-   ZOOM
-========================================================= */
-
-canvas.onwheel = e => {
+canvas.onwheel=e=>{
 
   e.preventDefault();
 
   zoomBy(
-    e.deltaY < 0
-      ? 1.1
-      : .9,
+    e.deltaY<0
+      ?1.1
+      :.9,
     e.clientX,
     e.clientY
   );
@@ -2239,7 +2234,7 @@ canvas.onwheel = e => {
 
 function applyView(){
 
-  world.style.transform =
+  world.style.transform=
     `translate(${panX}px,${panY}px) scale(${scale})`;
 
 }
@@ -2251,28 +2246,29 @@ function zoomBy(
   cy=(innerHeight+58)/2
 ){
 
-  const old = scale;
+  const old=scale;
 
-  scale =
+
+  scale=
     Math.max(
       .35,
       Math.min(
         2.5,
-        scale * f
+        scale*f
       )
     );
 
 
-  panX =
-    cx -
-    (cx - panX) *
-    (scale / old);
+  panX=
+    cx-
+    (cx-panX)*
+    (scale/old);
 
 
-  panY =
-    cy - 58 -
-    (cy - 58 - panY) *
-    (scale / old);
+  panY=
+    cy-58-
+    (cy-58-panY)*
+    (scale/old);
 
 
   applyView();
@@ -2282,11 +2278,9 @@ function zoomBy(
 
 function resetView(){
 
-  scale = 1;
-
-  panX = 0;
-
-  panY = 0;
+  scale=1;
+  panX=0;
+  panY=0;
 
   applyView();
 
@@ -2295,7 +2289,7 @@ function resetView(){
 
 /* =========================================================
    MACHINE PANEL
-========================================================= */
+   ========================================================= */
 
 function openPanel(id){
 
@@ -2310,47 +2304,43 @@ function openPanel(id){
   }
 
 
-  selected =
+  selected=
     machines.find(
-      m => m.id === id
+      m=>m.id===id
     );
 
 
-  const db =
+  const db=
     document.getElementById(
       'deleteMachineBtn'
     );
 
 
   if(db)
-    db.style.display =
+    db.style.display=
       'inline-flex';
 
 
   document.getElementById(
     'pname'
-  ).value =
+  ).value=
     selected.name;
 
 
   document.getElementById(
     'pcode'
-  ).value =
-    selected.code || '';
+  ).value=
+    selected.code||'';
 
 
   document.getElementById(
     'pstatus'
-  ).innerHTML =
-    statuses.map(s => `
+  ).innerHTML=
+    statuses.map(s=>`
 
       <option
         value="${s.id}"
-        ${
-          s.id === selected.status_id
-            ? 'selected'
-            : ''
-        }
+        ${s.id===selected.status_id?'selected':''}
       >
         ${esc(statusDisplayName(s.name))}
       </option>
@@ -2360,70 +2350,65 @@ function openPanel(id){
 
   document.getElementById(
     'panel'
-  ).style.display =
-    'block';
+  ).style.display='block';
 
 }
 
 
 function closePanel(){
 
-  selected = null;
+  selected=null;
 
-  const db =
+
+  const db=
     document.getElementById(
       'deleteMachineBtn'
     );
 
+
   if(db)
-    db.style.display =
-      'none';
+    db.style.display='none';
+
 
   document.getElementById(
     'panel'
-  ).style.display =
-    'none';
+  ).style.display='none';
 
 }
 
 
-/* =========================================================
-   SAVE MACHINE
-========================================================= */
-
 async function saveMachine(){
 
-  if(!selected)
-    return;
+  if(!selected)return;
 
 
-  const name =
+  const name=
     document.getElementById(
       'pname'
-    ).value.trim() ||
+    ).value.trim()||
     selected.name;
 
 
-  const code =
+  const code=
     document.getElementById(
       'pcode'
     ).value.trim();
 
 
-  const status_id =
+  const status_id=
     +document.getElementById(
       'pstatus'
     ).value;
 
 
-  const old = {
+  const old={
     ...selected
   };
 
 
   const {
     error
-  } =
+  }=
     await sb
       .from('machines')
       .update({
@@ -2431,7 +2416,10 @@ async function saveMachine(){
         code,
         status_id
       })
-      .eq('id',selected.id);
+      .eq(
+        'id',
+        selected.id
+      );
 
 
   if(error){
@@ -2443,7 +2431,7 @@ async function saveMachine(){
   }
 
 
-  if(old.name !== name){
+  if(old.name!==name)
 
     await logChange(
       selected.id,
@@ -2452,31 +2440,28 @@ async function saveMachine(){
       `${old.name} → ${name}`
     );
 
-  }
 
-
-  if(old.code !== code){
+  if(old.code!==code)
 
     await logChange(
       selected.id,
       name,
       'Tên đơn hàng / mã hàng',
-      `${old.code || ''} → ${code}`
+      `${old.code||''} → ${code}`
     );
 
-  }
 
+  if(old.status_id!==status_id){
 
-  if(old.status_id !== status_id){
-
-    const a =
+    const a=
       statuses.find(
-        s => s.id === old.status_id
+        s=>s.id===old.status_id
       )?.name;
 
-    const b =
+
+    const b=
       statuses.find(
-        s => s.id === status_id
+        s=>s.id===status_id
       )?.name;
 
 
@@ -2495,39 +2480,36 @@ async function saveMachine(){
 }
 
 
-/* =========================================================
-   DELETE MACHINE
-========================================================= */
-
 async function deleteMachine(){
 
   if(
-    !selected ||
+    !selected||
     !canEdit()
-  )
-    return;
+  )return;
 
 
   if(
     !confirm(
       'Xóa máy này?'
     )
-  )
-    return;
+  )return;
 
 
-  const m = {
+  const m={
     ...selected
   };
 
 
   const {
     error
-  } =
+  }=
     await sb
       .from('machines')
       .delete()
-      .eq('id',m.id);
+      .eq(
+        'id',
+        m.id
+      );
 
 
   if(error){
@@ -2552,27 +2534,22 @@ async function deleteMachine(){
 }
 
 
-/* =========================================================
-   ADD MACHINE
-========================================================= */
-
 async function addMachine(){
 
-  if(!canEdit())
-    return;
+  if(!canEdit())return;
 
 
   const {
     data,
     error
-  } =
+  }=
     await sb
       .from('machines')
       .insert({
         name:'Máy mới',
         code:'Chưa nhập',
         status_id:
-          statuses[0]?.id || 1,
+          statuses[0]?.id||1,
         x:150,
         y:120
       })
@@ -2606,10 +2583,6 @@ async function addMachine(){
 }
 
 
-/* =========================================================
-   HISTORY LOG
-========================================================= */
-
 async function logChange(
   machine_id,
   machine_name,
@@ -2625,7 +2598,7 @@ async function logChange(
       field,
       detail,
       changed_by:
-        currentUser?.id || null
+        currentUser?.id||null
     });
 
 }
@@ -2633,19 +2606,17 @@ async function logChange(
 
 /* =========================================================
    HISTORY
-========================================================= */
+   ========================================================= */
 
 function showHistory(){
 
-  if(!canEdit())
-    return;
+  if(!canEdit())return;
 
   renderHistory();
 
   document.getElementById(
     'historyPanel'
-  ).style.display =
-    'block';
+  ).style.display='block';
 
 }
 
@@ -2654,15 +2625,14 @@ function closeHistory(){
 
   document.getElementById(
     'historyPanel'
-  ).style.display =
-    'none';
+  ).style.display='none';
 
 }
 
 
 function renderHistory(){
 
-  const b =
+  const b=
     document.getElementById(
       'historyList'
     );
@@ -2670,7 +2640,7 @@ function renderHistory(){
 
   if(!history.length){
 
-    b.innerHTML =
+    b.innerHTML=
       '<div class="empty-history">Chưa có lịch sử.</div>';
 
     return;
@@ -2678,8 +2648,8 @@ function renderHistory(){
   }
 
 
-  b.innerHTML =
-    history.map(x => `
+  b.innerHTML=
+    history.map(x=>`
 
       <div class="hist">
 
@@ -2687,18 +2657,26 @@ function renderHistory(){
           ${esc(
             new Date(
               x.created_at
-            ).toLocaleString('vi-VN')
+            ).toLocaleString(
+              'vi-VN'
+            )
           )}
         </div>
 
         <div class="hist-main">
-          ${esc(x.machine_name || '')}
+          ${esc(
+            x.machine_name||''
+          )}
           —
-          ${esc(x.field)}
+          ${esc(
+            x.field
+          )}
         </div>
 
         <div class="hist-detail">
-          ${esc(x.detail || '')}
+          ${esc(
+            x.detail||''
+          )}
         </div>
 
       </div>
@@ -2709,8 +2687,8 @@ function renderHistory(){
 
 
 /* =========================================================
-   COLOR SETTINGS
-========================================================= */
+   COLORS
+   ========================================================= */
 
 function showColors(){
 
@@ -2727,10 +2705,10 @@ function showColors(){
 
   renderColorSettings();
 
+
   document.getElementById(
     'settingsPanel'
-  ).style.display =
-    'block';
+  ).style.display='block';
 
 }
 
@@ -2739,8 +2717,7 @@ function closeColors(){
 
   document.getElementById(
     'settingsPanel'
-  ).style.display =
-    'none';
+  ).style.display='none';
 
 }
 
@@ -2749,18 +2726,18 @@ function renderColorSettings(){
 
   document.getElementById(
     'colorSettings'
-  ).innerHTML =
+  ).innerHTML=
 
-    statuses.map(s => `
+    statuses.map(s=>`
 
       <div
         style="
           padding:10px 0;
           border-bottom:1px solid #eee
-        "
-      >
+        ">
 
-        <div class="color-grid">
+        <div
+          class="color-grid">
 
           <b>
             ${esc(s.name)}
@@ -2769,24 +2746,28 @@ function renderColorSettings(){
           <input
             type="color"
             id="bg_${s.id}"
-            value="${s.bg_color || '#cccccc'}"
-          >
+            value="${s.bg_color}">
 
           <input
             type="color"
             id="txt_${s.id}"
-            value="${s.text_color || '#000000'}"
-          >
+            value="${s.text_color}">
 
           <div
             class="preview"
             id="pv_${s.id}"
             style="
-              background:${s.bg_color || '#cccccc'};
-              color:${s.text_color || '#000000'}
-            "
-          >
-            Aa ${esc(statusDisplayName(s.name))}
+              background:${s.bg_color};
+              color:${s.text_color}
+            ">
+
+            Aa
+            ${esc(
+              statusDisplayName(
+                s.name
+              )
+            )}
+
           </div>
 
         </div>
@@ -2797,10 +2778,6 @@ function renderColorSettings(){
 
 }
 
-
-/* =========================================================
-   SAVE COLORS
-========================================================= */
 
 async function saveColors(){
 
@@ -2815,30 +2792,35 @@ async function saveColors(){
   }
 
 
-  for(const s of statuses){
+  for(
+    const s of statuses
+  ){
 
-    const bg =
+    const bg=
       document.getElementById(
-        'bg_' + s.id
+        'bg_'+s.id
       ).value;
 
 
-    const txt =
+    const txt=
       document.getElementById(
-        'txt_' + s.id
+        'txt_'+s.id
       ).value;
 
 
     const {
       error
-    } =
+    }=
       await sb
         .from('statuses')
         .update({
           bg_color:bg,
           text_color:txt
         })
-        .eq('id',s.id);
+        .eq(
+          'id',
+          s.id
+        );
 
 
     if(error){
@@ -2861,23 +2843,12 @@ async function saveColors(){
 }
 
 
-/* =========================================================
-   RESET COLORS
-========================================================= */
-
 async function resetColors(){
 
-  if(!canEdit())
-    return;
+  if(!canEdit())return;
 
 
-  /*
-    Mặc định theo thứ tự sort_order.
-    Nếu bạn có nhiều hơn 5 status,
-    status dư sẽ giữ màu hiện tại.
-  */
-
-  const defaults = [
+  const defaults=[
     ['#20b85a','#ffffff'],
     ['#2f80ed','#ffffff'],
     ['#f2b900','#000000'],
@@ -2892,15 +2863,16 @@ async function resetColors(){
     i++
   ){
 
-    if(!defaults[i])
-      continue;
-
-
     await sb
       .from('statuses')
       .update({
-        bg_color:defaults[i][0],
-        text_color:defaults[i][1]
+        bg_color:
+          defaults[i]?.[0]||
+          '#777777',
+
+        text_color:
+          defaults[i]?.[1]||
+          '#ffffff'
       })
       .eq(
         'id',
@@ -2921,31 +2893,29 @@ async function resetColors(){
 
 /* =========================================================
    EXPORT
-========================================================= */
+   ========================================================= */
 
 function showExport(){
 
-  if(!canEdit())
-    return;
+  if(!canEdit())return;
 
 
   document.getElementById(
     'exportFrom'
-  ).value = '';
+  ).value='';
 
 
   document.getElementById(
     'exportTo'
-  ).value = '';
+  ).value='';
 
 
   document.getElementById(
     'exportMachine'
-  ).innerHTML =
+  ).innerHTML=
 
-    '<option value="ALL">Tất cả máy</option>' +
-
-    machines.map(m => `
+    '<option value="ALL">Tất cả máy</option>'+
+    machines.map(m=>`
 
       <option value="${m.id}">
         ${esc(m.name)}
@@ -2956,8 +2926,7 @@ function showExport(){
 
   document.getElementById(
     'exportPanel'
-  ).style.display =
-    'block';
+  ).style.display='block';
 
 }
 
@@ -2966,49 +2935,50 @@ function closeExport(){
 
   document.getElementById(
     'exportPanel'
-  ).style.display =
-    'none';
+  ).style.display='none';
 
 }
 
 
 function doExport(){
 
-  const from =
+  const from=
     document.getElementById(
       'exportFrom'
     ).value;
 
 
-  const to =
+  const to=
     document.getElementById(
       'exportTo'
     ).value;
 
 
-  const mid =
+  const mid=
     document.getElementById(
       'exportMachine'
     ).value;
 
 
-  const a =
+  const a=
     from
-      ? new Date(
-          from + 'T00:00:00'
+      ?new Date(
+          from+
+          'T00:00:00'
         )
-      : null;
+      :null;
 
 
-  const b =
+  const b=
     to
-      ? new Date(
-          to + 'T23:59:59.999'
+      ?new Date(
+          to+
+          'T23:59:59.999'
         )
-      : null;
+      :null;
 
 
-  if(a && b && a > b){
+  if(a&&b&&a>b){
 
     alert(
       'Ngày bắt đầu lớn hơn ngày kết thúc.'
@@ -3019,38 +2989,35 @@ function doExport(){
   }
 
 
-  const rows =
+  let rows=
     history
-      .filter(x => {
+      .filter(x=>{
 
-        const d =
+        const d=
           new Date(
             x.created_at
           );
 
 
-        return (
-          (!a || d >= a) &&
-          (!b || d <= b) &&
+        return(
+          (!a||d>=a)&&
+          (!b||d<=b)&&
           (
-            mid === 'ALL' ||
-            String(x.machine_id) === mid
+            mid==='ALL'||
+            String(x.machine_id)===mid
           )
         );
 
       })
-      .map(x => [
-
+      .map(x=>[
         new Date(
           x.created_at
-        ).toLocaleString('vi-VN'),
-
-        x.machine_name || '',
-
-        x.field || '',
-
-        x.detail || ''
-
+        ).toLocaleString(
+          'vi-VN'
+        ),
+        x.machine_name||'',
+        x.field||'',
+        x.detail||''
       ]);
 
 
@@ -3065,9 +3032,8 @@ function doExport(){
   }
 
 
-  const csv =
-    '\ufeff' +
-
+  const csv=
+    '\ufeff'+
     [
       [
         'Thời gian',
@@ -3077,22 +3043,22 @@ function doExport(){
       ],
       ...rows
     ]
+      .map(
+        r=>
+          r
+            .map(
+              v=>
+                `"${String(v).replace(
+                  /"/g,
+                  '""'
+                )}"`
+            )
+            .join(',')
+      )
+      .join('\r\n');
 
-    .map(r =>
-      r
-        .map(v =>
-          `"${String(v).replace(
-            /"/g,
-            '""'
-          )}"`
-        )
-        .join(',')
-    )
 
-    .join('\r\n');
-
-
-  const blob =
+  const blob=
     new Blob(
       [csv],
       {
@@ -3102,23 +3068,29 @@ function doExport(){
     );
 
 
-  const url =
-    URL.createObjectURL(blob);
+  const url=
+    URL.createObjectURL(
+      blob
+    );
 
 
-  const el =
+  const el=
     document.createElement('a');
 
 
-  el.href = url;
+  el.href=url;
 
-  el.download =
+  el.download=
     'lich_su_may.csv';
+
 
   el.click();
 
 
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(
+    url
+  );
+
 
   closeExport();
 
@@ -3126,8 +3098,8 @@ function doExport(){
 
 
 /* =========================================================
-   USER MANAGEMENT
-========================================================= */
+   USERS
+   ========================================================= */
 
 async function showUsers(){
 
@@ -3144,8 +3116,7 @@ async function showUsers(){
 
   document.getElementById(
     'usersPanel'
-  ).style.display =
-    'block';
+  ).style.display='block';
 
 
   await loadProfiles();
@@ -3159,8 +3130,7 @@ function closeUsers(){
 
   document.getElementById(
     'usersPanel'
-  ).style.display =
-    'none';
+  ).style.display='none';
 
 }
 
@@ -3170,7 +3140,7 @@ async function loadProfiles(){
   const {
     data,
     error
-  } =
+  }=
     await sb
       .from('profiles')
       .select(
@@ -3183,14 +3153,14 @@ async function loadProfiles(){
 
     console.error(error);
 
-    profiles = [];
+    profiles=[];
 
     return;
 
   }
 
 
-  profiles = data || [];
+  profiles=data||[];
 
 }
 
@@ -3199,24 +3169,27 @@ function renderProfiles(){
 
   document.getElementById(
     'userList'
-  ).innerHTML =
+  ).innerHTML=
 
-    profiles.map(p => `
+    profiles.map(p=>`
 
       <div class="userrow">
 
         <div class="useremail">
-          ${esc(p.email || p.id)}
+          ${esc(
+            p.email||p.id
+          )}
         </div>
 
         <span
           class="badge ${
-            p.role === 'admin'
-              ? 'admin'
-              : 'viewer'
-          }"
-        >
+            p.role==='admin'
+              ?'admin'
+              :'viewer'
+          }">
+
           ${esc(p.role)}
+
         </span>
 
       </div>
@@ -3241,9 +3214,19 @@ async function createUser(){
 
 /* =========================================================
    BOOT
-========================================================= */
+   ========================================================= */
 
 loadAll();
+
+
+window.addEventListener(
+  'resize',
+  ()=>{
+    if(statuses.length){
+      render();
+    }
+  }
+);
 
 </script>
 
