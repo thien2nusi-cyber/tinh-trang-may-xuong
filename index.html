@@ -80,181 +80,546 @@ label{display:block;font-size:12px;font-weight:700;margin:9px 0 4px}input,select
 <label>Email</label><input id="loginEmail" type="email" autocomplete="username"><label>Mật khẩu</label><input id="loginPassword" type="password" autocomplete="current-password">
 <div id="loginError" class="error"></div><div class="row"><button class="btn primary" onclick="login()">Đăng nhập</button><button class="btn" onclick="closeAuth()">Hủy</button></div>
 <div class="note">Tài khoản được quản lý bởi Supabase Auth. Admin/Viewer được phân quyền bằng database RLS, không chỉ bằng giao diện.</div></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* UI: người có link chỉ thấy sơ đồ + nút Đăng nhập Admin; các nút quản trị chỉ hiện sau khi Admin đăng nhập. */
-/* ====== BƯỚC 1: dán 2 giá trị Supabase của bạn vào đây ====== */
-const SUPABASE_URL = 'https://maemqzfpsxczklixxaic.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_AfYltiueRPDKEicNVBTaiA__guFg0o_';
-/* Dán Project URL vào SUPABASE_URL. Publishable key đã được điền. */
-/* ============================================================ */
+const configured =
+  SUPABASE_URL.startsWith('https://') &&
+  !SUPABASE_URL.includes('YOUR_') &&
+  !SUPABASE_KEY.includes('YOUR_');
 
-const configured=SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('YOUR_') && !SUPABASE_KEY.includes('YOUR_');
-const sb=configured?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+const sb = configured
+  ? window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    )
+  : null;
 
-let machines=[],statuses=[],history=[],profiles=[],selected=null,scale=1,panX=0,panY=0,drag=null,pan=null,currentUser=null,currentRole=null;
-const world=document.getElementById('world'),canvas=document.getElementById('canvas');
+let machines = [];
+let statuses = [];
+let history = [];
+let profiles = [];
+let selected = null;
+let scale = 1;
+let panX = 0;
+let panY = 0;
+let drag = null;
+let pan = null;
+let currentUser = null;
+let currentRole = null;
 
-function esc(x){return String(x??'').replace(/[&<>"']/g,a=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[a]))}
-function canEdit(){return currentRole==='admin'}
-function setStatus(text,kind='online'){const e=document.getElementById('statusbar');e.innerHTML=`<span class="badge ${kind}">${esc(text)}</span>`}
-function closeAll(){['panel','historyPanel','settingsPanel','exportPanel','usersPanel'].forEach(id=>document.getElementById(id).style.display='none')}
+/* FIX REALTIME: giữ lại channel để không subscribe trùng */
+let realtimeChannel = null;
 
-function render(){
-world.innerHTML='';
-machines.forEach(m=>{
- const st=statuses.find(s=>s.id===m.status_id)||statuses[0]; if(!st)return;
- const d=document.createElement('div');d.className='machine';d.dataset.id=m.id;
- d.style.left=m.x+'px';d.style.top=m.y+'px';d.style.background=st.bg_color;d.style.color=st.text_color;
- d.innerHTML=`<div class="name">${esc(m.name)}</div><div class="code">${esc(m.code||'')}</div><div class="status">${esc(st.name)}</div>`;
- d.onmousedown=e=>startDrag(e,m);d.ondblclick=e=>{e.stopPropagation();openPanel(m.id)};world.appendChild(d);
-});
-document.getElementById('legend').innerHTML='<div class="legend-title">Chú thích trạng thái máy</div><div class="legend-items">'+statuses.map(s=>`<div class="legend-item" style="background:${s.bg_color};color:${s.text_color}">${esc(s.name)}</div>`).join('')+'</div>';
+const world = document.getElementById('world');
+const canvas = document.getElementById('canvas');
+
+function esc(x) {
+  return String(x ?? '').replace(/[&<>"']/g, a => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[a]));
 }
 
-async function loadAll(){
- if(!configured){setStatus('Chưa cấu hình Supabase','offline');openAuth();document.getElementById('loginError').textContent='Bạn cần điền SUPABASE_URL và SUPABASE_KEY trong code trước.';return}
- const {data:{session}}=await sb.auth.getSession(); currentUser=session?.user||null;
- console.log('SESSION:', session);
- await loadProfile(); await Promise.all([loadStatuses(),loadMachines(),loadHistory()]);
- updateAuthUI();render();subscribeRealtime();
- setStatus(currentUser?(canEdit()?'Admin — realtime':'Chỉ xem — realtime'):'Chỉ xem — realtime','online');
-}
-async function loadProfile(){
- currentRole=null;if(!currentUser)return;
- const {data,error}=await sb.from('profiles').select('role').eq('id',currentUser.id).maybeSingle();
- if(error){console.error(error);return}currentRole=data?.role||'viewer';
-}
-async function loadStatuses(){const {data,error}=await sb.from('statuses').select('*').order('id');if(error){alert(error.message);return}statuses=data||[]}
-async function loadMachines(){const {data,error}=await sb.from('machines').select('*').order('id');if(error){alert(error.message);return}machines=data||[]}
-async function loadHistory(){const {data,error}=await sb.from('change_history').select('*').order('created_at',{ascending:false}).limit(1000);if(error){console.error(error);return}history=data||[]}
-
-function subscribeRealtime(){
- sb.channel('machine-board')
- .on('postgres_changes',{event:'*',schema:'public',table:'machines'},async()=>{await loadMachines();render()})
- .on('postgres_changes',{event:'*',schema:'public',table:'statuses'},async()=>{await loadStatuses();render()})
- .on('postgres_changes',{event:'*',schema:'public',table:'change_history'},async()=>{await loadHistory();if(document.getElementById('historyPanel').style.display==='block')renderHistory()})
- .subscribe();
+function canEdit() {
+  return currentRole === 'admin';
 }
 
-function updateAuthUI(){
- const auth=document.getElementById('authBtn');
- const isAdmin = !!currentUser && currentRole === 'admin';
+function setStatus(text, kind = 'online') {
+  const e = document.getElementById('statusbar');
+  if (e) {
+    e.innerHTML = `<span class="badge ${kind}">${esc(text)}</span>`;
+  }
+}
 
- auth.textContent = isAdmin ? '👑 Admin • Đăng xuất' : '🔐 Đăng nhập Admin';
+function closeAll() {
+  [
+    'panel',
+    'historyPanel',
+    'settingsPanel',
+    'exportPanel',
+    'usersPanel'
+  ].forEach(id => {
+    const e = document.getElementById(id);
+    if (e) e.style.display = 'none';
+  });
+}
 
- ['addBtn','exportBtn','historyBtn','colorBtn'].forEach(id=>{
-   const e=document.getElementById(id);
-   if(e) e.style.display = isAdmin ? 'inline-flex' : 'none';
- });
+function render() {
+  world.innerHTML = '';
 
- // Người xem không nhìn thấy gợi ý chỉnh sửa.
- const hint = document.getElementById('hint');
- if(hint) hint.textContent = isAdmin
-   ? 'Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa'
-   : 'Kéo nền • Cuộn để zoom';
+  machines.forEach(m => {
+    const st =
+      statuses.find(s => s.id === m.status_id) ||
+      statuses[0];
+
+    if (!st) return;
+
+    const d = document.createElement('div');
+
+    d.className = 'machine';
+    d.dataset.id = m.id;
+
+    d.style.left = m.x + 'px';
+    d.style.top = m.y + 'px';
+    d.style.background = st.bg_color;
+    d.style.color = st.text_color;
+
+    d.innerHTML = `
+      <div class="name">${esc(m.name)}</div>
+      <div class="code">${esc(m.code || '')}</div>
+      <div class="status">${esc(st.name)}</div>
+    `;
+
+    d.onmousedown = e => startDrag(e, m);
+
+    d.ondblclick = e => {
+      e.stopPropagation();
+      openPanel(m.id);
+    };
+
+    world.appendChild(d);
+  });
+
+  document.getElementById('legend').innerHTML =
+    '<div class="legend-title">Chú thích trạng thái máy</div>' +
+    '<div class="legend-items">' +
+    statuses.map(s => `
+      <div
+        class="legend-item"
+        style="background:${s.bg_color};color:${s.text_color}"
+      >
+        ${esc(s.name)}
+      </div>
+    `).join('') +
+    '</div>';
 }
-function openAuth(){
-  if(currentUser && currentRole==='admin'){ sb.auth.signOut(); return; }
-  if(!configured){alert('Chưa cấu hình Supabase URL/Key.');return}
-  document.getElementById('loginPanel').style.display='block';
-  document.getElementById('loginOverlay').style.display='block';
-  document.getElementById('loginEmail').focus();
+
+
+async function loadAll() {
+  if (!configured) {
+    setStatus('Chưa cấu hình Supabase', 'offline');
+    openAuth();
+
+    document.getElementById('loginError').textContent =
+      'Bạn cần điền SUPABASE_URL và SUPABASE_KEY trong code trước.';
+
+    return;
+  }
+
+  const {
+    data: { session }
+  } = await sb.auth.getSession();
+
+  currentUser = session?.user || null;
+
+  await loadProfile();
+
+  await Promise.all([
+    loadStatuses(),
+    loadMachines(),
+    loadHistory()
+  ]);
+
+  updateAuthUI();
+  render();
+
+  subscribeRealtime();
+
+  setStatus(
+    currentUser
+      ? (canEdit()
+          ? 'Admin — realtime'
+          : 'Chỉ xem — realtime')
+      : 'Chỉ xem — realtime',
+    'online'
+  );
 }
-function closeAuth(){document.getElementById('loginPanel').style.display='none';document.getElementById('loginOverlay').style.display='none'}
-const VIEWER_CODE='123456';
-let viewerUnlocked=sessionStorage.getItem('viewerUnlocked')==='1';
-function showViewerGate(){
- if(viewerUnlocked)return;
- const g=document.getElementById('viewerGate'); if(g){g.style.display='flex';document.getElementById('viewerCode').focus();}
+
+
+async function loadProfile() {
+  currentRole = null;
+
+  if (!currentUser) return;
+
+  const {
+    data,
+    error
+  } = await sb
+    .from('profiles')
+    .select('role')
+    .eq('id', currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  currentRole = data?.role || 'viewer';
 }
-function unlockViewer(){
- const v=document.getElementById('viewerCode').value;
- if(v===VIEWER_CODE){viewerUnlocked=true;sessionStorage.setItem('viewerUnlocked','1');document.getElementById('viewerGate').style.display='none';updateAuthUI();return}
- document.getElementById('viewerError').textContent='Mã xem không đúng.';
+
+
+async function loadStatuses() {
+  const {
+    data,
+    error
+  } = await sb
+    .from('statuses')
+    .select('*')
+    .order('id');
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  statuses = data || [];
 }
-async function login(){
- const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value;
- const e=document.getElementById('loginError');e.textContent='';
- if(!email||!password){e.textContent='Nhập email và mật khẩu.';return}
- const {error}=await sb.auth.signInWithPassword({email,password});if(error){e.textContent=error.message;return}
- closeAuth();await loadAll();
+
+
+async function loadMachines() {
+  const {
+    data,
+    error
+  } = await sb
+    .from('machines')
+    .select('*')
+    .order('id');
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  machines = data || [];
 }
-sb?.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_OUT'){
-    currentUser=null;
-    currentRole=null;
-    closeAll();
+
+
+async function loadHistory() {
+  const {
+    data,
+    error
+  } = await sb
+    .from('change_history')
+    .select('*')
+    .order('created_at', {
+      ascending: false
+    })
+    .limit(1000);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  history = data || [];
+}
+
+
+/* =========================
+   REALTIME - ĐÃ SỬA LỖI
+   ========================= */
+
+function subscribeRealtime() {
+
+  /* Nếu đã có channel cũ thì hủy trước */
+  if (realtimeChannel) {
+    realtimeChannel.unsubscribe();
+    realtimeChannel = null;
+  }
+
+  realtimeChannel = sb.channel('machine-board');
+
+  realtimeChannel
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'machines'
+      },
+      async () => {
+        await loadMachines();
+        render();
+      }
+    )
+
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'statuses'
+      },
+      async () => {
+        await loadStatuses();
+        render();
+      }
+    )
+
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'change_history'
+      },
+      async () => {
+        await loadHistory();
+
+        const historyPanel =
+          document.getElementById('historyPanel');
+
+        if (
+          historyPanel &&
+          historyPanel.style.display === 'block'
+        ) {
+          renderHistory();
+        }
+      }
+    )
+
+    .subscribe(status => {
+      console.log('Realtime:', status);
+    });
+}
+
+
+function updateAuthUI() {
+  const auth = document.getElementById('authBtn');
+
+  const isAdmin =
+    !!currentUser &&
+    currentRole === 'admin';
+
+  auth.textContent =
+    isAdmin
+      ? '👑 Admin • Đăng xuất'
+      : '🔐 Đăng nhập Admin';
+
+  [
+    'addBtn',
+    'exportBtn',
+    'historyBtn',
+    'colorBtn'
+  ].forEach(id => {
+    const e = document.getElementById(id);
+
+    if (e) {
+      e.style.display =
+        isAdmin
+          ? 'inline-flex'
+          : 'none';
+    }
+  });
+
+  /*
+    Admin: hiện hướng dẫn
+    Viewer: chỉ hiện hướng dẫn xem
+  */
+  const hint =
+    document.getElementById('hint');
+
+  if (hint) {
+    hint.textContent =
+      isAdmin
+        ? 'Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa'
+        : 'Kéo nền • Cuộn để zoom';
+  }
+}
+
+
+function openAuth() {
+
+  if (
+    currentUser &&
+    currentRole === 'admin'
+  ) {
+    sb.auth.signOut();
+    return;
+  }
+
+  if (!configured) {
+    alert(
+      'Chưa cấu hình Supabase URL/Key.'
+    );
+    return;
+  }
+
+  document.getElementById(
+    'loginPanel'
+  ).style.display = 'block';
+
+  document.getElementById(
+    'loginOverlay'
+  ).style.display = 'block';
+
+  document.getElementById(
+    'loginEmail'
+  ).focus();
+}
+
+
+function closeAuth() {
+  document.getElementById(
+    'loginPanel'
+  ).style.display = 'none';
+
+  document.getElementById(
+    'loginOverlay'
+  ).style.display = 'none';
+}
+
+
+const VIEWER_CODE = '123456';
+
+let viewerUnlocked =
+  sessionStorage.getItem(
+    'viewerUnlocked'
+  ) === '1';
+
+
+function showViewerGate() {
+
+  if (viewerUnlocked) return;
+
+  const g =
+    document.getElementById(
+      'viewerGate'
+    );
+
+  if (g) {
+    g.style.display = 'flex';
+
+    document.getElementById(
+      'viewerCode'
+    ).focus();
+  }
+}
+
+
+function unlockViewer() {
+
+  const v =
+    document.getElementById(
+      'viewerCode'
+    ).value;
+
+  if (v === VIEWER_CODE) {
+
+    viewerUnlocked = true;
+
+    sessionStorage.setItem(
+      'viewerUnlocked',
+      '1'
+    );
+
+    document.getElementById(
+      'viewerGate'
+    ).style.display = 'none';
+
     updateAuthUI();
-    setStatus('Đã đăng xuất — chỉ xem','viewer');
+
+    return;
   }
+
+  document.getElementById(
+    'viewerError'
+  ).textContent =
+    'Mã xem không đúng.';
+}
+
+
+async function login() {
+
+  const email =
+    document.getElementById(
+      'loginEmail'
+    ).value.trim();
+
+  const password =
+    document.getElementById(
+      'loginPassword'
+    ).value;
+
+  const e =
+    document.getElementById(
+      'loginError'
+    );
+
+  e.textContent = '';
+
+  if (!email || !password) {
+    e.textContent =
+      'Nhập email và mật khẩu.';
+    return;
+  }
+
+  const {
+    error
+  } = await sb.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    e.textContent =
+      error.message;
+    return;
+  }
+
+  closeAuth();
+
+  await loadAll();
+}
+
+
+sb?.auth.onAuthStateChange(
+  async (event, session) => {
+
+    if (event === 'SIGNED_OUT') {
+
+      currentUser = null;
+      currentRole = null;
+
+      /* Hủy realtime channel cũ */
+      if (realtimeChannel) {
+        await realtimeChannel.unsubscribe();
+        realtimeChannel = null;
+      }
+
+      closeAll();
+      updateAuthUI();
+
+      setStatus(
+        'Đã đăng xuất — chỉ xem',
+        'viewer'
+      );
+    }
+  }
+);
+
+
+/* Khởi động */
+loadAll().then(() => {
+
+  if (
+    !currentUser &&
+    !viewerUnlocked
+  ) {
+    showViewerGate();
+  }
+
 });
-</script>
-
-<script>
-/* Machine board interactions */
-function startDrag(e,m){if(!canEdit()||e.button!==0)return;e.stopPropagation();drag={m,sx:e.clientX,sy:e.clientY,ox:m.x,oy:m.y};document.onmousemove=moveDrag;document.onmouseup=endDrag}
-function moveDrag(e){if(!drag)return;drag.m.x=drag.ox+(e.clientX-drag.sx)/scale;drag.m.y=drag.oy+(e.clientY-drag.sy)/scale;const d=document.querySelector(`[data-id="${drag.m.id}"]`);if(d){d.style.left=drag.m.x+'px';d.style.top=drag.m.y+'px'}}
-async function endDrag(){if(!drag)return;const m=drag.m;drag=null;document.onmousemove=null;document.onmouseup=null;const {error}=await sb.from('machines').update({x:Math.round(m.x),y:Math.round(m.y)}).eq('id',m.id);if(error)alert(error.message);else await logChange(m.id,m.name,'Vị trí',`(${Math.round(m.x)}, ${Math.round(m.y)})`)}
-canvas.onmousedown=e=>{if(e.target!==canvas&&e.target!==world)return;pan={sx:e.clientX,sy:e.clientY,ox:panX,oy:panY};document.onmousemove=e=>{panX=pan.ox+e.clientX-pan.sx;panY=pan.oy+e.clientY-pan.sy;applyView()};document.onmouseup=()=>{document.onmousemove=null;document.onmouseup=null;pan=null}}
-canvas.onwheel=e=>{e.preventDefault();zoomBy(e.deltaY<0?1.1:.9,e.clientX,e.clientY)}
-function applyView(){world.style.transform=`translate(${panX}px,${panY}px) scale(${scale})`}
-function zoomBy(f,cx=innerWidth/2,cy=(innerHeight+58)/2){const old=scale;scale=Math.max(.35,Math.min(2.5,scale*f));panX=cx-(cx-panX)*(scale/old);panY=cy-58-(cy-58-panY)*(scale/old);applyView()}
-function resetView(){scale=1;panX=0;panY=0;applyView()}
-
-function openPanel(id){if(!canEdit()){alert('Bạn đang ở chế độ chỉ xem.');return}selected=machines.find(m=>m.id===id);document.getElementById('pname').value=selected.name;document.getElementById('pcode').value=selected.code||'';document.getElementById('pstatus').innerHTML=statuses.map(s=>`<option value="${s.id}" ${s.id===selected.status_id?'selected':''}>${esc(s.name)}</option>`).join('');document.getElementById('panel').style.display='block'}
-function closePanel(){selected=null;document.getElementById('panel').style.display='none'}
-async function saveMachine(){
- if(!selected)return;
- const name=document.getElementById('pname').value.trim()||selected.name,code=document.getElementById('pcode').value.trim(),status_id=+document.getElementById('pstatus').value;
- const old={...selected};const {error}=await sb.from('machines').update({name,code,status_id}).eq('id',selected.id);if(error){alert(error.message);return}
- if(old.name!==name)await logChange(selected.id,name,'Tên máy',`${old.name} → ${name}`);
- if(old.code!==code)await logChange(selected.id,name,'Tên đơn hàng / mã hàng',`${old.code||''} → ${code}`);
- if(old.status_id!==status_id){const a=statuses.find(s=>s.id===old.status_id)?.name,b=statuses.find(s=>s.id===status_id)?.name;await logChange(selected.id,name,'Trạng thái',`${a} → ${b}`)}
- closePanel();
-}
-async function deleteMachine(){if(!selected||!canEdit())return;if(!confirm('Xóa máy này?'))return;const m={...selected};const {error}=await sb.from('machines').delete().eq('id',m.id);if(error){alert(error.message);return}await logChange(null,m.name,'Xóa máy',m.name);closePanel()}
-async function addMachine(){if(!canEdit())return;const {data,error}=await sb.from('machines').insert({name:'Máy mới',code:'Chưa nhập',status_id:statuses[0]?.id||1,x:150,y:120}).select().single();if(error){alert(error.message);return}await logChange(data.id,data.name,'Tạo máy','Tạo mới');await loadMachines();render();openPanel(data.id)}
-
-async function logChange(machine_id,machine_name,field,detail){await sb.from('change_history').insert({machine_id,machine_name,field,detail,changed_by:currentUser?.id||null})}
-
-function showHistory(){if(!canEdit())return;renderHistory();document.getElementById('historyPanel').style.display='block'}
-function closeHistory(){document.getElementById('historyPanel').style.display='none'}
-function renderHistory(){const b=document.getElementById('historyList');if(!history.length){b.innerHTML='<div class="empty-history">Chưa có lịch sử.</div>';return}b.innerHTML=history.map(x=>`<div class="hist"><div class="hist-time">${esc(new Date(x.created_at).toLocaleString('vi-VN'))}</div><div class="hist-main">${esc(x.machine_name||'')} — ${esc(x.field)}</div><div class="hist-detail">${esc(x.detail||'')}</div></div>`).join('')}
-
-function showColors(){if(!canEdit()){alert('Chỉ Admin mới được đổi màu.');return}renderColorSettings();document.getElementById('settingsPanel').style.display='block'}
-function closeColors(){document.getElementById('settingsPanel').style.display='none'}
-function renderColorSettings(){document.getElementById('colorSettings').innerHTML=statuses.map(s=>`<div style="padding:10px 0;border-bottom:1px solid #eee"><div class="color-grid"><b>${esc(s.name)}</b><input type="color" id="bg_${s.id}" value="${s.bg_color}"><input type="color" id="txt_${s.id}" value="${s.text_color}"><div class="preview" id="pv_${s.id}" style="background:${s.bg_color};color:${s.text_color}">Aa ${esc(s.name)}</div></div></div>`).join('')}
-async function saveColors(){
-  if(!canEdit()){alert('Chỉ Admin mới được đổi màu.');return}
-  for(const s of statuses){
-    const bg=document.getElementById('bg_'+s.id).value;
-    const txt=document.getElementById('txt_'+s.id).value;
-    const {error}=await sb.from('statuses').update({bg_color:bg,text_color:txt}).eq('id',s.id);
-    if(error){alert(error.message);return}
-  }
-  await loadStatuses();
-  render();                 // máy đổi theo màu mới nhất ngay lập tức
-  closeColors();
-}
-async function resetColors(){if(!canEdit())return;const defaults=[['#20b85a','#ffffff'],['#2f80ed','#ffffff'],['#f2b900','#000000'],['#e5484d','#ffffff'],['#8b4de8','#ffffff']];for(let i=0;i<statuses.length;i++)await sb.from('statuses').update({bg_color:defaults[i][0],text_color:defaults[i][1]}).eq('id',statuses[i].id);await loadStatuses();render();renderColorSettings()}
-
-function showExport(){if(!canEdit())return;document.getElementById('exportFrom').value='';document.getElementById('exportTo').value='';document.getElementById('exportMachine').innerHTML='<option value="ALL">Tất cả máy</option>'+machines.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');document.getElementById('exportPanel').style.display='block'}
-function closeExport(){document.getElementById('exportPanel').style.display='none'}
-function doExport(){const from=document.getElementById('exportFrom').value,to=document.getElementById('exportTo').value,mid=document.getElementById('exportMachine').value;const a=from?new Date(from+'T00:00:00'):null,b=to?new Date(to+'T23:59:59.999'):null;if(a&&b&&a>b){alert('Ngày bắt đầu lớn hơn ngày kết thúc.');return}let rows=history.filter(x=>{const d=new Date(x.created_at);return(!a||d>=a)&&(!b||d<=b)&&(mid==='ALL'||String(x.machine_id)===mid)}).map(x=>[new Date(x.created_at).toLocaleString('vi-VN'),x.machine_name||'',x.field||'',x.detail||'']);if(!rows.length){alert('Không có dữ liệu phù hợp.');return}const csv='\ufeff'+[['Thời gian','Máy','Nội dung','Chi tiết'],...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),el=document.createElement('a');el.href=url;el.download='lich_su_may.csv';el.click();URL.revokeObjectURL(url);closeExport()}
-
-/* Admin user management via Supabase Edge Function is intentionally not faked in the browser.
-   For a first free deployment, create users in Supabase Auth dashboard and then insert their role in profiles.
-   The UI below is read-only for user list; setup instructions explain the safe path. */
-async function showUsers(){if(!canEdit()){alert('Chỉ Admin mới xem được phần này.');return}document.getElementById('usersPanel').style.display='block';await loadProfiles();renderProfiles()}
-function closeUsers(){document.getElementById('usersPanel').style.display='none'}
-async function loadProfiles(){const {data,error}=await sb.from('profiles').select('id,email,role').order('email');if(error){console.error(error);profiles=[];return}profiles=data||[]}
-function renderProfiles(){document.getElementById('userList').innerHTML=profiles.map(p=>`<div class="userrow"><div class="useremail">${esc(p.email||p.id)}</div><span class="badge ${p.role==='admin'?'admin':'viewer'}">${esc(p.role)}</span></div>`).join('')||'<div class="small">Chưa có hồ sơ.</div>'}
-async function createUser(){alert('Để giữ bảo mật trên bản Free, hãy tạo user trong Supabase Authentication → Users, sau đó thêm dòng role trong profiles. Xem README_SETUP.md đi kèm.');}
-
-/* Boot */
-loadAll().then(()=>{if(!currentUser && !viewerUnlocked)showViewerGate();});
 </script>
 </body>
 </html>
