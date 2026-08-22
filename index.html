@@ -133,20 +133,27 @@ body{
 
 /* =========================================================
    CHÚ THÍCH TRẠNG THÁI
+   TỰ ĐỘNG ĐỔI KÍCH THƯỚC + SỐ CỘT THEO SỐ STATUS
    ========================================================= */
 
 #legend{
   position:absolute;
   right:18px;
   bottom:18px;
+
+  /* JS sẽ tự thay width theo số trạng thái */
   width:fit-content;
   max-width:calc(100vw - 36px);
+
   background:#fff;
   border:1px solid #d9dee7;
   border-radius:14px;
   box-shadow:0 6px 24px #0002;
+
   padding:14px;
+
   z-index:6;
+
   transition:
     width .2s ease,
     height .2s ease
@@ -161,93 +168,39 @@ body{
 .legend-items{
   display:grid;
   gap:8px;
+
+  /*
+     grid-template-columns được JS tự tạo.
+     Không cố định 5 cột nữa.
+  */
+
   width:100%
 }
 
 .legend-item{
   min-width:0;
   min-height:54px;
+
   border-radius:10px;
   padding:9px 10px;
+
   text-align:center;
   font-weight:700;
   font-size:15px;
   line-height:16px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
+  /*
+     Cho phép tên status dài tự xuống dòng
+  */
   white-space:normal;
   overflow-wrap:anywhere;
   word-break:break-word;
+
   box-shadow:inset 0 0 0 1px #ffffff55
-}
-
-
-/* =========================================================
-   THỐNG KÊ MÁY
-   ========================================================= */
-
-#machineStats{
-  position:absolute;
-  left:18px;
-  bottom:18px;
-  width:280px;
-  max-width:calc(100vw - 36px);
-  background:#fff;
-  border:1px solid #d9dee7;
-  border-radius:14px;
-  box-shadow:0 6px 24px #0002;
-  padding:14px;
-  z-index:6
-}
-
-.stats-title{
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:10px
-}
-
-.stats-total{
-  background:#f3f4f6;
-  border-radius:9px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  font-size:14px;
-  font-weight:700
-}
-
-.stats-total strong{
-  font-size:20px;
-  color:#2563eb
-}
-
-.stats-list{
-  display:flex;
-  flex-direction:column;
-  gap:6px
-}
-
-.stats-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:7px 9px;
-  border-radius:8px;
-  font-size:13px;
-  font-weight:700
-}
-
-.stats-name{
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap
-}
-
-.stats-count{
-  flex:none;
-  font-size:13px
 }
 
 
@@ -558,8 +511,10 @@ select{
     left:14px;
     right:14px;
     bottom:14px;
+
     width:auto !important;
     max-width:none;
+
     padding:12px
   }
 
@@ -573,15 +528,6 @@ select{
     min-height:50px;
     font-size:11px;
     padding:8px
-  }
-
-  #machineStats{
-    left:14px;
-    right:14px;
-    bottom:14px;
-    width:auto;
-    max-width:none;
-    transform:translateY(-150px)
   }
 
   #hint{
@@ -655,9 +601,6 @@ select{
 
   <div id="legend"></div>
 
-  <!-- THỐNG KÊ TỔNG SỐ MÁY -->
-  <div id="machineStats"></div>
-
 </div>
 
 
@@ -687,6 +630,7 @@ select{
   </button>
 
 </div>
+
 
 
 <!-- PANEL MÁY -->
@@ -1273,90 +1217,6 @@ function statusDisplayName(name){
 
 
 /* =========================================================
-   THỐNG KÊ MÁY
-   ========================================================= */
-
-function renderMachineStats(){
-
-  const box=
-    document.getElementById('machineStats');
-
-  if(!box)return;
-
-
-  const total=
-    machines.length;
-
-
-  /*
-     Đếm số máy theo từng status_id
-  */
-
-  const counts={};
-
-  machines.forEach(m=>{
-
-    const id=
-      String(m.status_id);
-
-    counts[id]=
-      (counts[id]||0)+1;
-
-  });
-
-
-  box.innerHTML=`
-
-    <div class="stats-title">
-      📊 Thống kê máy
-    </div>
-
-    <div class="stats-total">
-      Tổng số máy:
-      <strong>${total}</strong>
-    </div>
-
-    <div class="stats-list">
-
-      ${
-        statuses.map(s=>{
-
-          const count=
-            counts[String(s.id)]||0;
-
-          return `
-
-            <div
-              class="stats-row"
-              style="
-                background:${s.bg_color};
-                color:${s.text_color};
-              "
-            >
-
-              <span class="stats-name">
-                ${esc(statusDisplayName(s.name))}
-              </span>
-
-              <span class="stats-count">
-                ${count} máy
-              </span>
-
-            </div>
-
-          `;
-
-        }).join('')
-      }
-
-    </div>
-
-  `;
-
-}
-
-
-/* =========================================================
    RENDER
    ========================================================= */
 
@@ -1429,6 +1289,24 @@ function render(){
   /*
      ========================================================
      CHÚ THÍCH TỰ ĐỘNG
+
+     Không còn cố định 5 cột.
+
+     Số status -> số cột:
+
+     1  = 1
+     2  = 2
+     3  = 3
+     4  = 4
+     5  = 3
+     6  = 3
+     7  = 4
+     8  = 4
+     9  = 3
+     10 = 5
+     11+ = 5
+
+     Sau đó JS tự tính chiều rộng khung.
      ========================================================
   */
 
@@ -1484,6 +1362,12 @@ function render(){
   }
 
 
+  /*
+     Kích thước mỗi ô.
+     Khung sẽ lớn nhỏ theo số cột,
+     chứ không còn width:680px cố định.
+  */
+
   const itemWidth=145;
   const gap=8;
   const padding=28;
@@ -1493,6 +1377,10 @@ function render(){
     (columns-1)*gap+
     padding;
 
+
+  /*
+     Không cho vượt quá màn hình.
+  */
 
   const maxWidth=
     Math.min(
@@ -1506,6 +1394,11 @@ function render(){
       maxWidth
     );
 
+
+  /*
+     Nếu màn hình nhỏ thì để CSS mobile
+     tự xử lý.
+  */
 
   if(window.innerWidth<=850){
 
@@ -1552,13 +1445,6 @@ function render(){
     </div>
 
   `;
-
-
-  /*
-     CẬP NHẬT THỐNG KÊ
-  */
-
-  renderMachineStats();
 
 }
 
@@ -1898,7 +1784,16 @@ function updateAuthUI(){
     document.getElementById('hint');
 
 
+  if(hint){
 
+    hint.textContent=
+      isAdmin
+        ? 'Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa'
+        : 'Kéo nền • Cuộn để zoom';
+
+  }
+
+}
 
 
 function openAuth(){
@@ -2582,10 +2477,6 @@ async function saveMachine(){
   }
 
 
-  await loadMachines();
-
-  render();
-
   closePanel();
 
 }
@@ -2639,10 +2530,6 @@ async function deleteMachine(){
     m.name
   );
 
-
-  await loadMachines();
-
-  render();
 
   closePanel();
 
@@ -3212,9 +3099,6 @@ function doExport(){
 }
 
 
-/* =========================================================
-   USERS
-   ========================================================= */
 
 async function showUsers(){
 
@@ -3334,6 +3218,10 @@ async function createUser(){
 loadAll();
 
 
+/*
+   Khi thay đổi kích thước cửa sổ,
+   tính lại khung chú thích.
+*/
 window.addEventListener(
   'resize',
   ()=>{
@@ -3347,3 +3235,4 @@ window.addEventListener(
 
 </body>
 </html>
+file code của t như này, sao giờ admin bấm chức năng thêm máy mà sửa tên đổi kiểu ko được nữa, xóa máy cx ko xóa được
