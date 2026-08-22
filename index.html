@@ -114,7 +114,7 @@ body{
 }
 
 .machine .code{
-  font-size:25px;
+  font-size:20px;
   margin-top:7px;
   font-weight:700;
   white-space:nowrap;
@@ -129,7 +129,13 @@ body{
   font-weight:700;
   text-align:center
 }
-
+.machine .date{
+  font-size:15px;
+  margin-top:5px;
+  font-weight:600;
+  text-align:center;
+  white-space:nowrap;
+}
 
 /* =========================================================
    CHÚ THÍCH TRẠNG THÁI
@@ -739,15 +745,31 @@ select{
 
   <input id="pname">
 
-  <label>
-    Tên đơn hàng / mã hàng
-  </label>
+ <label>
+  Tên đơn hàng / mã hàng
+</label>
 
-  <input id="pcode">
+<input id="pcode">
 
-  <label>
-    Trạng thái
-  </label>
+<label>
+  Ngày bắt đầu
+</label>
+
+<input
+  id="pstartdate"
+  type="date">
+
+<label>
+  Ngày kết thúc
+</label>
+
+<input
+  id="penddate"
+  type="date">
+
+<label>
+  Trạng thái
+</label>
 
   <select id="pstatus"></select>
 
@@ -1251,7 +1273,15 @@ function esc(x){
     );
 
 }
+function formatDate(date){
 
+  if(!date)return '';
+
+  const [y,m,d]=String(date).split('-');
+
+  return `${d}/${m}`;
+
+}
 
 function canEdit(){
 
@@ -1396,16 +1426,23 @@ function render(){
     d.style.color=
       st.text_color;
 
-    d.innerHTML=`
-      <div class="name">
-        ${esc(m.name)}
-      </div>
+  d.innerHTML=`
+  <div class="name">
+    ${esc(m.name)}
+  </div>
 
-      <div class="code">
-        ${esc(m.code||'')}
-      </div>
+  <div class="code">
+    ${esc(m.code||'')}
+  </div>
 
-    `;
+  <div class="date">
+    ${
+      m.start_date || m.end_date
+        ? `${m.start_date ? formatDate(m.start_date) : ''}${m.start_date && m.end_date ? ' → ' : ''}${m.end_date ? formatDate(m.end_date) : ''}`
+        : ''
+    }
+  </div>
+`;
 
     d.onmousedown=e=>{
 
@@ -2480,7 +2517,15 @@ function openPanel(id){
     'pcode'
   ).value=
     selected.code||'';
+document.getElementById(
+  'pstartdate'
+).value=
+  selected.start_date||'';
 
+document.getElementById(
+  'penddate'
+).value=
+  selected.end_date||'';
 
   document.getElementById(
     'pstatus'
@@ -2538,17 +2583,38 @@ async function saveMachine(){
     selected.name;
 
 
-  const code=
-    document.getElementById(
-      'pcode'
-    ).value.trim();
+ const code=
+  document.getElementById(
+    'pcode'
+  ).value.trim();
 
+const start_date=
+  document.getElementById(
+    'pstartdate'
+  ).value||null;
 
-  const status_id=
+const end_date=
+  document.getElementById(
+    'penddate'
+  ).value||null;
+
+const status_id=
     +document.getElementById(
       'pstatus'
     ).value;
+if(
+  start_date &&
+  end_date &&
+  start_date>end_date
+){
 
+  alert(
+    'Ngày kết thúc không được trước ngày bắt đầu.'
+  );
+
+  return;
+
+}
 
   const old={
     ...selected
@@ -2560,11 +2626,13 @@ async function saveMachine(){
   }=
     await sb
       .from('machines')
-      .update({
-        name,
-        code,
-        status_id
-      })
+     .update({
+  name,
+  code,
+  start_date,
+  end_date,
+  status_id
+})
       .eq(
         'id',
         selected.id
