@@ -132,26 +132,21 @@ body{
 
 
 /* =========================================================
-   CHÚ THÍCH + THỐNG KÊ MÁY
+   CHÚ THÍCH TRẠNG THÁI
    ========================================================= */
 
 #legend{
   position:absolute;
   right:18px;
   bottom:18px;
-
   width:fit-content;
   max-width:calc(100vw - 36px);
-
   background:#fff;
   border:1px solid #d9dee7;
   border-radius:14px;
   box-shadow:0 6px 24px #0002;
-
   padding:14px;
-
   z-index:6;
-
   transition:
     width .2s ease,
     height .2s ease
@@ -163,27 +158,6 @@ body{
   margin-bottom:10px
 }
 
-
-/* Tổng số máy */
-
-.machine-total{
-  font-size:14px;
-  margin-bottom:10px;
-  padding:9px 10px;
-  background:#f5f7fa;
-  border-radius:8px;
-  color:#333;
-  text-align:center
-}
-
-.machine-total b{
-  font-size:18px;
-  color:#2563eb
-}
-
-
-/* Các trạng thái */
-
 .legend-items{
   display:grid;
   gap:8px;
@@ -192,39 +166,88 @@ body{
 
 .legend-item{
   min-width:0;
-  min-height:62px;
-
+  min-height:54px;
   border-radius:10px;
   padding:9px 10px;
-
   text-align:center;
   font-weight:700;
   font-size:15px;
   line-height:16px;
-
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-
-  gap:5px;
-
   white-space:normal;
   overflow-wrap:anywhere;
   word-break:break-word;
-
   box-shadow:inset 0 0 0 1px #ffffff55
 }
 
-.legend-item .status-name{
-  font-size:14px;
-  line-height:17px
+
+/* =========================================================
+   THỐNG KÊ MÁY
+   ========================================================= */
+
+#machineStats{
+  position:absolute;
+  left:18px;
+  bottom:18px;
+  width:280px;
+  max-width:calc(100vw - 36px);
+  background:#fff;
+  border:1px solid #d9dee7;
+  border-radius:14px;
+  box-shadow:0 6px 24px #0002;
+  padding:14px;
+  z-index:6
 }
 
-.legend-item .status-count{
-  font-size:18px;
-  line-height:20px;
-  font-weight:800
+.stats-title{
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:10px
+}
+
+.stats-total{
+  background:#f3f4f6;
+  border-radius:9px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  font-size:14px;
+  font-weight:700
+}
+
+.stats-total strong{
+  font-size:20px;
+  color:#2563eb
+}
+
+.stats-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px
+}
+
+.stats-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:7px 9px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:700
+}
+
+.stats-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.stats-count{
+  flex:none;
+  font-size:13px
 }
 
 
@@ -535,10 +558,8 @@ select{
     left:14px;
     right:14px;
     bottom:14px;
-
     width:auto !important;
     max-width:none;
-
     padding:12px
   }
 
@@ -549,21 +570,18 @@ select{
 
   .legend-item{
     min-width:0;
-    min-height:58px;
+    min-height:50px;
     font-size:11px;
     padding:8px
   }
 
-  .legend-item .status-name{
-    font-size:11px
-  }
-
-  .legend-item .status-count{
-    font-size:16px
-  }
-
-  .machine-total{
-    font-size:13px
+  #machineStats{
+    left:14px;
+    right:14px;
+    bottom:14px;
+    width:auto;
+    max-width:none;
+    transform:translateY(-150px)
   }
 
   #hint{
@@ -636,6 +654,9 @@ select{
   <div id="world"></div>
 
   <div id="legend"></div>
+
+  <!-- THỐNG KÊ TỔNG SỐ MÁY -->
+  <div id="machineStats"></div>
 
 </div>
 
@@ -1252,6 +1273,90 @@ function statusDisplayName(name){
 
 
 /* =========================================================
+   THỐNG KÊ MÁY
+   ========================================================= */
+
+function renderMachineStats(){
+
+  const box=
+    document.getElementById('machineStats');
+
+  if(!box)return;
+
+
+  const total=
+    machines.length;
+
+
+  /*
+     Đếm số máy theo từng status_id
+  */
+
+  const counts={};
+
+  machines.forEach(m=>{
+
+    const id=
+      String(m.status_id);
+
+    counts[id]=
+      (counts[id]||0)+1;
+
+  });
+
+
+  box.innerHTML=`
+
+    <div class="stats-title">
+      📊 Thống kê máy
+    </div>
+
+    <div class="stats-total">
+      Tổng số máy:
+      <strong>${total}</strong>
+    </div>
+
+    <div class="stats-list">
+
+      ${
+        statuses.map(s=>{
+
+          const count=
+            counts[String(s.id)]||0;
+
+          return `
+
+            <div
+              class="stats-row"
+              style="
+                background:${s.bg_color};
+                color:${s.text_color};
+              "
+            >
+
+              <span class="stats-name">
+                ${esc(statusDisplayName(s.name))}
+              </span>
+
+              <span class="stats-count">
+                ${count} máy
+              </span>
+
+            </div>
+
+          `;
+
+        }).join('')
+      }
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
    RENDER
    ========================================================= */
 
@@ -1321,9 +1426,11 @@ function render(){
   });
 
 
-  /* ========================================================
-     CHÚ THÍCH + TỔNG SỐ MÁY + SỐ MÁY THEO TRẠNG THÁI
-     ======================================================== */
+  /*
+     ========================================================
+     CHÚ THÍCH TỰ ĐỘNG
+     ========================================================
+  */
 
   const legend=
     document.getElementById('legend');
@@ -1418,11 +1525,6 @@ function render(){
       Chú thích trạng thái máy
     </div>
 
-    <div class="machine-total">
-      Tổng số máy:
-      <b>${machines.length}</b>
-    </div>
-
     <div
       class="legend-items"
       style="
@@ -1431,42 +1533,32 @@ function render(){
       "
     >
 
-      ${statuses.map(s=>{
+      ${statuses.map(s=>`
 
-        const machineCount=
-          machines.filter(
-            m=>m.status_id===s.id
-          ).length;
+        <div
+          class="legend-item"
+          style="
+            background:${s.bg_color};
+            color:${s.text_color};
+          "
+        >
 
-        return `
+          ${esc(statusDisplayName(s.name))}
 
-          <div
-            class="legend-item"
-            style="
-              background:${s.bg_color};
-              color:${s.text_color};
-            "
-          >
+        </div>
 
-            <div class="status-name">
-              ${esc(
-                statusDisplayName(s.name)
-              )}
-            </div>
-
-            <div class="status-count">
-              ${machineCount} máy
-            </div>
-
-          </div>
-
-        `;
-
-      }).join('')}
+      `).join('')}
 
     </div>
 
   `;
+
+
+  /*
+     CẬP NHẬT THỐNG KÊ
+  */
+
+  renderMachineStats();
 
 }
 
@@ -1800,6 +1892,14 @@ function updateAuthUI(){
     }
 
   });
+
+
+  const hint=
+    document.getElementById('hint');
+
+
+
+
 
 function openAuth(){
 
