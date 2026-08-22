@@ -209,13 +209,20 @@ body{
 
 #machineStats{
   position:absolute;
-  left:16px;
-  top:108px;
+  right:18px;
+  bottom:230px;
+
+  left:auto;
+  top:auto;
+
   background:#fff;
   border-radius:10px;
-  box-shadow:0 2px 12px #0002;
+  box-shadow:0 6px 24px #0002;
+
   padding:10px 12px;
+
   z-index:7;
+
   min-width:230px;
   max-width:320px;
 }
@@ -267,12 +274,16 @@ body{
 
 @media(max-width:850px){
 
-  #machineStats{
-    left:14px;
-    top:108px;
-    min-width:190px;
-    max-width:calc(100vw - 28px);
-  }
+#machineStats{
+  left:14px;
+  right:14px;
+  bottom:190px;
+
+  top:auto;
+
+  min-width:0;
+  max-width:none;
+}
 
 }
 /* =========================================================
