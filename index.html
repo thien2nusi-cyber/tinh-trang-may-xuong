@@ -132,8 +132,7 @@ body{
 
 
 /* =========================================================
-   CHÚ THÍCH TRẠNG THÁI
-   TỰ ĐỘNG ĐỔI KÍCH THƯỚC + SỐ CỘT THEO SỐ STATUS
+   CHÚ THÍCH + THỐNG KÊ MÁY
    ========================================================= */
 
 #legend{
@@ -141,7 +140,6 @@ body{
   right:18px;
   bottom:18px;
 
-  /* JS sẽ tự thay width theo số trạng thái */
   width:fit-content;
   max-width:calc(100vw - 36px);
 
@@ -165,21 +163,36 @@ body{
   margin-bottom:10px
 }
 
+
+/* Tổng số máy */
+
+.machine-total{
+  font-size:14px;
+  margin-bottom:10px;
+  padding:9px 10px;
+  background:#f5f7fa;
+  border-radius:8px;
+  color:#333;
+  text-align:center
+}
+
+.machine-total b{
+  font-size:18px;
+  color:#2563eb
+}
+
+
+/* Các trạng thái */
+
 .legend-items{
   display:grid;
   gap:8px;
-
-  /*
-     grid-template-columns được JS tự tạo.
-     Không cố định 5 cột nữa.
-  */
-
   width:100%
 }
 
 .legend-item{
   min-width:0;
-  min-height:54px;
+  min-height:62px;
 
   border-radius:10px;
   padding:9px 10px;
@@ -190,17 +203,28 @@ body{
   line-height:16px;
 
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
 
-  /*
-     Cho phép tên status dài tự xuống dòng
-  */
+  gap:5px;
+
   white-space:normal;
   overflow-wrap:anywhere;
   word-break:break-word;
 
   box-shadow:inset 0 0 0 1px #ffffff55
+}
+
+.legend-item .status-name{
+  font-size:14px;
+  line-height:17px
+}
+
+.legend-item .status-count{
+  font-size:18px;
+  line-height:20px;
+  font-weight:800
 }
 
 
@@ -525,9 +549,21 @@ select{
 
   .legend-item{
     min-width:0;
-    min-height:50px;
+    min-height:58px;
     font-size:11px;
     padding:8px
+  }
+
+  .legend-item .status-name{
+    font-size:11px
+  }
+
+  .legend-item .status-count{
+    font-size:16px
+  }
+
+  .machine-total{
+    font-size:13px
   }
 
   #hint{
@@ -630,7 +666,6 @@ select{
   </button>
 
 </div>
-
 
 
 <!-- PANEL MÁY -->
@@ -1286,29 +1321,9 @@ function render(){
   });
 
 
-  /*
-     ========================================================
-     CHÚ THÍCH TỰ ĐỘNG
-
-     Không còn cố định 5 cột.
-
-     Số status -> số cột:
-
-     1  = 1
-     2  = 2
-     3  = 3
-     4  = 4
-     5  = 3
-     6  = 3
-     7  = 4
-     8  = 4
-     9  = 3
-     10 = 5
-     11+ = 5
-
-     Sau đó JS tự tính chiều rộng khung.
-     ========================================================
-  */
+  /* ========================================================
+     CHÚ THÍCH + TỔNG SỐ MÁY + SỐ MÁY THEO TRẠNG THÁI
+     ======================================================== */
 
   const legend=
     document.getElementById('legend');
@@ -1362,12 +1377,6 @@ function render(){
   }
 
 
-  /*
-     Kích thước mỗi ô.
-     Khung sẽ lớn nhỏ theo số cột,
-     chứ không còn width:680px cố định.
-  */
-
   const itemWidth=145;
   const gap=8;
   const padding=28;
@@ -1377,10 +1386,6 @@ function render(){
     (columns-1)*gap+
     padding;
 
-
-  /*
-     Không cho vượt quá màn hình.
-  */
 
   const maxWidth=
     Math.min(
@@ -1394,11 +1399,6 @@ function render(){
       maxWidth
     );
 
-
-  /*
-     Nếu màn hình nhỏ thì để CSS mobile
-     tự xử lý.
-  */
 
   if(window.innerWidth<=850){
 
@@ -1418,6 +1418,11 @@ function render(){
       Chú thích trạng thái máy
     </div>
 
+    <div class="machine-total">
+      Tổng số máy:
+      <b>${machines.length}</b>
+    </div>
+
     <div
       class="legend-items"
       style="
@@ -1426,21 +1431,38 @@ function render(){
       "
     >
 
-      ${statuses.map(s=>`
+      ${statuses.map(s=>{
 
-        <div
-          class="legend-item"
-          style="
-            background:${s.bg_color};
-            color:${s.text_color};
-          "
-        >
+        const machineCount=
+          machines.filter(
+            m=>m.status_id===s.id
+          ).length;
 
-          ${esc(statusDisplayName(s.name))}
+        return `
 
-        </div>
+          <div
+            class="legend-item"
+            style="
+              background:${s.bg_color};
+              color:${s.text_color};
+            "
+          >
 
-      `).join('')}
+            <div class="status-name">
+              ${esc(
+                statusDisplayName(s.name)
+              )}
+            </div>
+
+            <div class="status-count">
+              ${machineCount} máy
+            </div>
+
+          </div>
+
+        `;
+
+      }).join('')}
 
     </div>
 
@@ -1778,23 +1800,6 @@ function updateAuthUI(){
     }
 
   });
-
-
-  const hint=
-    document.getElementById('hint');
-
-
-  if(hint){
-
-    hint.textContent=
-      isAdmin
-        ? 'Kéo máy • Kéo nền • Cuộn để zoom • Nhấp đúp máy để sửa'
-        : 'Kéo nền • Cuộn để zoom';
-
-  }
-
-}
-
 
 function openAuth(){
 
@@ -2477,6 +2482,10 @@ async function saveMachine(){
   }
 
 
+  await loadMachines();
+
+  render();
+
   closePanel();
 
 }
@@ -2530,6 +2539,10 @@ async function deleteMachine(){
     m.name
   );
 
+
+  await loadMachines();
+
+  render();
 
   closePanel();
 
@@ -3221,10 +3234,6 @@ async function createUser(){
 loadAll();
 
 
-/*
-   Khi thay đổi kích thước cửa sổ,
-   tính lại khung chú thích.
-*/
 window.addEventListener(
   'resize',
   ()=>{
