@@ -108,13 +108,13 @@ body{
 
 .machine .name{
   font-weight:800;
-  font-size:22px;
+  font-size:25px;
   line-height:22px;
   text-align:center
 }
 
 .machine .code{
-  font-size:15px;
+  font-size:25px;
   margin-top:7px;
   font-weight:700;
   white-space:nowrap;
@@ -1405,9 +1405,6 @@ function render(){
         ${esc(m.code||'')}
       </div>
 
-      <div class="status">
-        ${esc(statusDisplayName(st.name))}
-      </div>
     `;
 
     d.onmousedown=e=>{
